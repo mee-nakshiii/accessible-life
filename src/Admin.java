@@ -2,22 +2,20 @@ import java.util.ArrayList;
 import java.util.List;
 public class Admin extends User{
     private String adminID;
-    private String name;
-    private String email;
     private String permissions;
     private List<Place> createdPlaces;
     private String actionLog;
     private List<Report> assignedReports;
     private boolean isActive;
     public Admin() {
+
         this.createdPlaces = new ArrayList<>();
         this.assignedReports = new ArrayList<>();
         this.isActive = true;
     }
     public Admin(String adminID, String name, String email, String permissions) {
+        super(name,email);
         this.adminID = adminID;
-        this.name = name;
-        this.email = email;
         this.permissions = permissions;
         this.createdPlaces = new ArrayList<>();
         this.assignedReports = new ArrayList<>();
@@ -45,15 +43,11 @@ public class Admin extends User{
 
 
     public void removeReview(RatingReview review) {
-            System.out.println("Removing review by: " + review.getReviewerName());
-            actionLog = "Removed review by: " + review.getReviewerName();
+        System.out.println("Removing review by: " + review.getUser());
+        actionLog = "Removed review by: " + review.getUser();
     }
     public String getAdminID() {return adminID;}
     public void setAdminID(String adminID) {this.adminID = adminID;}
-    public String getName() {return name;}
-    public void setName(String name) {this.name = name;}
-    public String getEmail() {return email;}
-    public void setEmail(String email) {this.email = email;}
     public String getPermissions() {return permissions;}
     public void setPermissions(String permissions) {this.permissions = permissions;}
     public boolean isActive() {return isActive;}
