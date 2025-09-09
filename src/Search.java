@@ -1,7 +1,8 @@
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Search {
+public class Search
+{
     private List<Place> places;
 
     // Constructor to initialize the list of places
@@ -10,7 +11,8 @@ public class Search {
     }
 
     // Search by location (e.g., Kochi, Bangalore)
-    public List<Place> searchByLocation(String location) {
+    public List<Place> searchByLocation(String location)
+    {
         return places.stream()
                 .filter(place -> place.getLocation() != null &&
                         place.getLocation().equalsIgnoreCase(location))
@@ -18,7 +20,8 @@ public class Search {
     }
 
     // Search by specific accessibility feature
-    public List<Place> searchByFeature(String feature) {
+    public List<Place> searchByFeature(String feature)
+    {
         return places.stream()
                 .filter(place -> {
                     switch (feature.toLowerCase()) {
@@ -33,7 +36,8 @@ public class Search {
     }
 
     // Search by keyword in short description or featuresAvailable
-    public List<Place> searchByKeyword(String keyword) {
+    public List<Place> searchByKeyword(String keyword)
+    {
         return places.stream()
                 .filter(place -> (place.getShortDescription() != null &&
                         place.getShortDescription().toLowerCase().contains(keyword.toLowerCase())) ||
@@ -43,7 +47,8 @@ public class Search {
     }
 
     // Search for verified places only
-    public List<Place> searchVerifiedPlaces() {
+    public List<Place> searchVerifiedPlaces()
+    {
         return places.stream()
                 .filter(Place::isVerified)
                 .collect(Collectors.toList());
