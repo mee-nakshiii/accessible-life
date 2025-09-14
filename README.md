@@ -4,29 +4,6 @@ A Java-based system for managing reviews and accessibility information for publi
 
 ---
 
-## 📦 Project Structure
-
-accessible-life/ 
-├── src/ 
-│└── main/ 
-│       └── java/ 
-│           └── com/ 
-│               └── accessiblelife/ 
-│                   ├── Main.java 
-│                   ├── model/ 
-│                   │   └── Place.java 
-│                   ├── ratingreview/ 
-│                   │   ├── RatingReview.java 
-│                   │   ├── RatingReviewManager.java 
-│                   │   └── Report.java 
-│                   └── admin/ 
-│                       └── Admin.java 
-├── README.md 
-├── .gitignore 
-└── accessiblelife.iml
-
----
-
 ## 🚀 How to Run
 
 1. Clone the repo:
