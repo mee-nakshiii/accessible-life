@@ -1,0 +1,385 @@
+Index: src/Place.java
+===================================================================
+diff --git a/src/Place.java b/src/com/accessiblelife/place/Place.java
+rename from src/Place.java
+rename to src/com/accessiblelife/place/Place.java
+--- a/src/Place.java	(revision f039b372962e519d2fe2d9f9ec8d1c87926315d6)
++++ b/src/com/accessiblelife/place/Place.java	(date 1757830541702)
+@@ -1,3 +1,5 @@
++package com.accessiblelife.place;
++
+ import java.util.ArrayList;
+ import java.util.List;
+ 
+@@ -44,7 +46,7 @@
+ 
+ 
+     public void viewDetails() {
+-        System.out.println("----- Place Details -----");
++        System.out.println("----- com.accessiblelife.place.Place Details -----");
+         System.out.println("Location: " + location);
+         System.out.println("Address: " + specificAddress);
+         System.out.println("Description: " + shortDescription);
+@@ -62,33 +64,33 @@
+ 
+     public void addPlace() {
+         this.addNewPlace = true;
+-        System.out.println("Place successfully added: " + shortDescription);
++        System.out.println("com.accessiblelife.place.Place successfully added: " + shortDescription);
+     }
+ 
+ 
+     public void editPlace(String newDescription, String newFeatures) {
+         this.shortDescription = newDescription;
+         this.featuresAvailable = newFeatures;
+-        System.out.println("Place updated successfully: " + shortDescription);
++        System.out.println("com.accessiblelife.place.Place updated successfully: " + shortDescription);
+     }
+ 
+ 
+     public void deletePlace() {
+         this.deletePlace = true;
+-        System.out.println("Place deleted successfully: " + shortDescription);
++        System.out.println("com.accessiblelife.place.Place deleted successfully: " + shortDescription);
+     }
+ 
+ 
+     public void verifyPlace() {
+         this.isVerified = true;
+         this.verificationVote++;
+-        System.out.println("Place verified successfully: " + shortDescription);
++        System.out.println("com.accessiblelife.place.Place verified successfully: " + shortDescription);
+     }
+ 
+ 
+     public void reportPlace(String reason) {
+         this.reportCount++;
+-        System.out.println("Place reported. Reason: " + reason);
++        System.out.println("com.accessiblelife.place.Place reported. Reason: " + reason);
+     }
+ 
+ 
+Index: src/Search.java
+===================================================================
+diff --git a/src/Search.java b/src/com/accessiblelife/search/Search.java
+rename from src/Search.java
+rename to src/com/accessiblelife/search/Search.java
+--- a/src/Search.java	(revision f039b372962e519d2fe2d9f9ec8d1c87926315d6)
++++ b/src/com/accessiblelife/search/Search.java	(date 1757830541718)
+@@ -1,3 +1,7 @@
++package com.accessiblelife.search;
++
++import com.accessiblelife.place.Place;
++
+ import java.util.List;
+ import java.util.stream.Collectors;
+ 
+@@ -10,7 +14,7 @@
+         this.places = places;
+     }
+ 
+-    // Search by location (e.g., Kochi, Bangalore)
++    // com.accessiblelife.search.Search by location (e.g., Kochi, Bangalore)
+     public List<Place> searchByLocation(String location)
+     {
+         return places.stream()
+@@ -19,7 +23,7 @@
+                 .collect(Collectors.toList());
+     }
+ 
+-    // Search by specific accessibility feature
++    // com.accessiblelife.search.Search by specific accessibility feature
+     public List<Place> searchByFeature(String feature)
+     {
+         return places.stream()
+@@ -35,7 +39,7 @@
+                 .collect(Collectors.toList());
+     }
+ 
+-    // Search by keyword in short description or featuresAvailable
++    // com.accessiblelife.search.Search by keyword in short description or featuresAvailable
+     public List<Place> searchByKeyword(String keyword)
+     {
+         return places.stream()
+@@ -46,7 +50,7 @@
+                 .collect(Collectors.toList());
+     }
+ 
+-    // Search for verified places only
++    // com.accessiblelife.search.Search for verified places only
+     public List<Place> searchVerifiedPlaces()
+     {
+         return places.stream()
+Index: src/com/accessiblelife/search/Place.java
+===================================================================
+diff --git a/src/com/accessiblelife/search/Place.java b/src/com/accessiblelife/search/Place.java
+new file mode 100644
+--- /dev/null	(date 1757830541718)
++++ b/src/com/accessiblelife/search/Place.java	(date 1757830541718)
+@@ -0,0 +1,193 @@
++package com.accessiblelife.search;
++
++import java.util.ArrayList;
++import java.util.List;
++
++public class Place {
++
++
++    private List<Place> accessiblePlaceNearby;
++    private String location;
++    private String specificAddress;
++    private String shortDescription;
++    private String featuresAvailable;
++    private boolean addNewPlace;
++    private boolean deletePlace;
++    private boolean hasRamp;
++    private boolean hasElevator;
++    private boolean hasBrailleSignage;
++    private boolean hasAccessibleToilet;
++    private boolean isVerified;
++    private int verificationVote;
++    private int reportCount;
++
++
++    public Place() {
++        this.accessiblePlaceNearby = new ArrayList<>();
++        this.featuresAvailable = "";
++        this.addNewPlace = false;
++        this.deletePlace = false;
++        this.hasRamp = false;
++        this.hasElevator = false;
++        this.hasBrailleSignage = false;
++        this.hasAccessibleToilet = false;
++        this.isVerified = false;
++        this.verificationVote = 0;
++        this.reportCount = 0;
++    }
++
++    public Place(String location, String specificAddress, String shortDescription, String featuresAvailable) {
++        this();
++        this.location = location;
++        this.specificAddress = specificAddress;
++        this.shortDescription = shortDescription;
++        this.featuresAvailable = featuresAvailable;
++    }
++
++
++    public void viewDetails() {
++        System.out.println("----- com.accessiblelife.place.Place Details -----");
++        System.out.println("Location: " + location);
++        System.out.println("Address: " + specificAddress);
++        System.out.println("Description: " + shortDescription);
++        System.out.println("Features: " + featuresAvailable);
++        System.out.println("Has Ramp: " + hasRamp);
++        System.out.println("Has Elevator: " + hasElevator);
++        System.out.println("Has Braille Signage: " + hasBrailleSignage);
++        System.out.println("Accessible Toilet: " + hasAccessibleToilet);
++        System.out.println("Verified: " + isVerified);
++        System.out.println("Verification Votes: " + verificationVote);
++        System.out.println("Reports: " + reportCount);
++        System.out.println("------------------------");
++    }
++
++
++    public void addPlace() {
++        this.addNewPlace = true;
++        System.out.println("com.accessiblelife.place.Place successfully added: " + shortDescription);
++    }
++
++
++    public void editPlace(String newDescription, String newFeatures) {
++        this.shortDescription = newDescription;
++        this.featuresAvailable = newFeatures;
++        System.out.println("com.accessiblelife.place.Place updated successfully: " + shortDescription);
++    }
++
++
++    public void deletePlace() {
++        this.deletePlace = true;
++        System.out.println("com.accessiblelife.place.Place deleted successfully: " + shortDescription);
++    }
++
++
++    public void verifyPlace() {
++        this.isVerified = true;
++        this.verificationVote++;
++        System.out.println("com.accessiblelife.place.Place verified successfully: " + shortDescription);
++    }
++
++
++    public void reportPlace(String reason) {
++        this.reportCount++;
++        System.out.println("com.accessiblelife.place.Place reported. Reason: " + reason);
++    }
++
++
++
++    public List<Place> getAccessiblePlaceNearby() {
++        return accessiblePlaceNearby;
++    }
++
++    public void setAccessiblePlaceNearby(List<Place> accessiblePlaceNearby) {
++        this.accessiblePlaceNearby = accessiblePlaceNearby;
++    }
++
++    public String getLocation() {
++        return location;
++    }
++
++    public void setLocation(String location) {
++        this.location = location;
++    }
++
++    public String getSpecificAddress() {
++        return specificAddress;
++    }
++
++    public void setSpecificAddress(String specificAddress) {
++        this.specificAddress = specificAddress;
++    }
++
++    public String getShortDescription() {
++        return shortDescription;
++    }
++
++    public void setShortDescription(String shortDescription) {
++        this.shortDescription = shortDescription;
++    }
++
++    public String getFeaturesAvailable() {
++        return featuresAvailable;
++    }
++
++    public void setFeaturesAvailable(String featuresAvailable) {
++        this.featuresAvailable = featuresAvailable;
++    }
++
++    public boolean hasRamp() {
++        return hasRamp;
++    }
++
++    public void setHasRamp(boolean hasRamp) {
++        this.hasRamp = hasRamp;
++    }
++
++    public boolean hasElevator() {
++        return hasElevator;
++    }
++
++    public void setHasElevator(boolean hasElevator) {
++        this.hasElevator = hasElevator;
++    }
++
++    public boolean hasBrailleSignage() {
++        return hasBrailleSignage;
++    }
++
++    public void setHasBrailleSignage(boolean hasBrailleSignage) {
++        this.hasBrailleSignage = hasBrailleSignage;
++    }
++
++    public boolean hasAccessibleToilet() {
++        return hasAccessibleToilet;
++    }
++
++    public void setHasAccessibleToilet(boolean hasAccessibleToilet) {
++        this.hasAccessibleToilet = hasAccessibleToilet;
++    }
++
++    public boolean isVerified() {
++        return isVerified;
++    }
++
++    public void setVerified(boolean verified) {
++        isVerified = verified;
++    }
++
++    public int getVerificationVote() {
++        return verificationVote;
++    }
++
++    public void setVerificationVote(int verificationVote) {
++        this.verificationVote = verificationVote;
++    }
++
++    public int getReportCount() {
++        return reportCount;
++    }
++
++    public void setReportCount(int reportCount) {
++        this.reportCount = reportCount;
++    }
++}
+Index: src/com/accessiblelife/ratingreview/RatingReview.java
+===================================================================
+diff --git a/src/com/accessiblelife/ratingreview/RatingReview.java b/src/com/accessiblelife/ratingreview/RatingReview.java
+new file mode 100644
+--- /dev/null	(date 1757830541702)
++++ b/src/com/accessiblelife/ratingreview/RatingReview.java	(date 1757830541702)
+@@ -0,0 +1,36 @@
++package com.accessiblelife.ratingreview;
++
++public class RatingReview
++{
++    private String user;
++    private int rating;
++    private String review;
++
++    public RatingReview(String user, int rating, String review)
++    {
++        this.user = user;
++        this.rating = rating;
++        this.review = review;
++    }
++
++    public String getUser()
++    {
++        return user;
++    }
++
++    public int getRating()
++    {
++        return rating;
++    }
++
++    public String getReview()
++    {
++        return review;
++    }
++
++    @Override
++    public String toString()
++    {
++        return user + " rated " + rating + "/5 - " + review;
++    }
++}
+Index: src/com/accessiblelife/Main.java
+===================================================================
+diff --git a/src/com/accessiblelife/Main.java b/src/com/accessiblelife/Main.java
+new file mode 100644
+--- /dev/null	(date 1757830541702)
++++ b/src/com/accessiblelife/Main.java	(date 1757830541702)
+@@ -0,0 +1,23 @@
++package com.accessiblelife;
++
++import com.accessiblelife.ratingreview.RatingReview;
++import com.accessiblelife.ratingreview.RatingReviewManager;
++
++public class Main
++{
++    public static void main(String[] args)
++    {
++        RatingReviewManager manager = new RatingReviewManager();
++
++        // Adding some sample reviews
++        manager.addReview(new RatingReview("Alice", 5, "Amazing product!"));
++        manager.addReview(new RatingReview("Bob", 4, "Very good, but could be improved."));
++        manager.addReview(new RatingReview("Charlie", 3, "It’s okay, average experience."));
++
++        // Show all reviews
++        manager.showReviews();
++
++        // Show average rating
++        System.out.println("Average Rating: " + manager.getAverageRating());
++    }
++}

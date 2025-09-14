@@ -1,0 +1,16 @@
+Index: src/Admin.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Admin.java b/src/com/accessiblelife/admin/Admin.java
+rename from src/Admin.java
+rename to src/com/accessiblelife/admin/Admin.java
+--- a/src/Admin.java	(revision 44764b4ac948a0f9f61e67677ec3ad1621fcfedf)
++++ b/src/com/accessiblelife/admin/Admin.java	(date 1757830671310)
+@@ -1,3 +1,5 @@
++package com.accessiblelife.admin;
++
+ import java.util.ArrayList;
+ import java.util.List;
+ public class Admin extends User{

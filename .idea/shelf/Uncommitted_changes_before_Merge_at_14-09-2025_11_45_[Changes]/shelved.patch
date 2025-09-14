@@ -1,0 +1,147 @@
+Index: README.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># accessible-life\r\nJava Android mobile app for accessibility services.\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/README.md b/README.md
+--- a/README.md	(revision f039b372962e519d2fe2d9f9ec8d1c87926315d6)
++++ b/README.md	(date 1757830541702)
+@@ -1,2 +1,30 @@
+-# accessible-life
+-Java Android mobile app for accessibility services.
++# Accessible Life
++
++A project for managing accessibility features like:
++- com.accessiblelife.place.Place com.accessiblelife.search.Search
++- User Management
++- Rating and Review system
++
++## Project Structure
++accessible-life/
++│
++├── .gitignore
++├── README.md
++├── accessible-life.iml
++├── src/
++│ └── com/
++│ └── com.accessiblelife/
++│ ├── search/
++│ ├── ratingreview/
++│ ├── user/
++│ └── Main.java
++├── .idea/
++└── out/ (ignored by Git)
++
++pgsql
++Copy code
++
++## How to Run
++1. Open the project in IntelliJ IDEA.
++2. Ensure SDK is set to Java 17 (or your version).
++3. Run `Main.java`.
+\ No newline at end of file
+Index: src/com/accessiblelife/ratingreview/RatingReviewManager.java
+===================================================================
+diff --git a/src/com/accessiblelife/ratingreview/RatingReviewManager.java b/src/com/accessiblelife/ratingreview/RatingReviewManager.java
+new file mode 100644
+--- /dev/null	(date 1757830541702)
++++ b/src/com/accessiblelife/ratingreview/RatingReviewManager.java	(date 1757830541702)
+@@ -0,0 +1,41 @@
++package com.accessiblelife.ratingreview;
++
++import java.util.ArrayList;
++import java.util.List;
++
++
++public class RatingReviewManager
++{
++    private final List<RatingReview> reviews = new ArrayList<>();
++
++    public void addReview(RatingReview review)
++    {
++        reviews.add(review);
++    }
++
++    public void showReviews()
++    {
++        if (reviews.isEmpty())
++        {
++            System.out.println("No reviews yet.");
++        } else
++        {
++            for (RatingReview review : reviews)
++            {
++                System.out.println(review);
++            }
++        }
++    }
++
++    public double getAverageRating()
++    {
++        if (reviews.isEmpty()) return 0.0;
++
++        double sum = 0;
++        for (RatingReview review : reviews)
++        {
++            sum += review.getRating();
++        }
++        return sum / reviews.size();
++    }
++}
+Index: .gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># Gradle files\r\n.gradle/\r\nbuild/\r\n\r\n# Local configuration file (sdk path, etc)\r\nlocal.properties\r\n\r\n# Log/OS Files\r\n*.log\r\n\r\n# Android Studio generated files and folders\r\ncaptures/\r\n.externalNativeBuild/\r\n.cxx/\r\n*.aab\r\n*.apk\r\noutput-metadata.json\r\n\r\n# IntelliJ\r\n*.iml\r\n.idea/\r\nmisc.xml\r\ndeploymentTargetDropDown.xml\r\nrender.experimental.xml\r\n\r\n# Keystore files\r\n*.jks\r\n*.keystore\r\n\r\n# Google Services (e.g. APIs or Firebase)\r\ngoogle-services.json\r\n\r\n# Android Profiling\r\n*.hprof\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.gitignore b/.gitignore
+--- a/.gitignore	(revision 3e87a2d1231c33e97ffcb0136e5cc8fdc4f7b8e5)
++++ b/.gitignore	(date 1757830541702)
+@@ -1,34 +1,14 @@
+-# Gradle files
+-.gradle/
++# IntelliJ project files
++.idea/workspace.xml
++.idea/shelf/
++
++# Build output
++/out/
+ build/
+ 
+-# Local configuration file (sdk path, etc)
+-local.properties
+-
+-# Log/OS Files
++# Logs
+ *.log
+ 
+-# Android Studio generated files and folders
+-captures/
+-.externalNativeBuild/
+-.cxx/
+-*.aab
+-*.apk
+-output-metadata.json
+-
+-# IntelliJ
+-*.iml
+-.idea/
+-misc.xml
+-deploymentTargetDropDown.xml
+-render.experimental.xml
+-
+-# Keystore files
+-*.jks
+-*.keystore
+-
+-# Google Services (e.g. APIs or Firebase)
+-google-services.json
+-
+-# Android Profiling
+-*.hprof
++# OS-specific
++.DS_Store
++Thumbs.db
