@@ -1,4 +1,4 @@
-package com.accessiblelife;
+package com.accessiblelife.ratingreview;
 
 public class RatingReview
 {

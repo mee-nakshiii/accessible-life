@@ -1,5 +1,8 @@
 package com.accessiblelife;
 
+import com.accessiblelife.ratingreview.RatingReview;
+import com.accessiblelife.ratingreview.RatingReviewManager;
+
 public class Main
 {
     public static void main(String[] args)
@@ -16,5 +19,11 @@ public class Main
 
         // Show average rating
         System.out.println("Average Rating: " + manager.getAverageRating());
+
+        Place p = new Place("Kochi", "MG Road", "Wheelchair accessible cafe", "Ramp, Toilet");
+        RatingReview r = new RatingReview("Harsha", 5, "Great place!");
+        RatingReviewManager manager = new RatingReviewManager();
+        manager.addReview(p, r);
+        manager.showReviews(p);
     }
 }

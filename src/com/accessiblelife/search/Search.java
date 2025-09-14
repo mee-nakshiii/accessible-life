@@ -1,3 +1,5 @@
+package com.accessiblelife.search;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,7 +12,7 @@ public class Search
         this.places = places;
     }
 
-    // Search by location (e.g., Kochi, Bangalore)
+    // com.accessiblelife.search.Search by location (e.g., Kochi, Bangalore)
     public List<Place> searchByLocation(String location)
     {
         return places.stream()
@@ -19,7 +21,7 @@ public class Search
                 .collect(Collectors.toList());
     }
 
-    // Search by specific accessibility feature
+    // com.accessiblelife.search.Search by specific accessibility feature
     public List<Place> searchByFeature(String feature)
     {
         return places.stream()
@@ -35,7 +37,7 @@ public class Search
                 .collect(Collectors.toList());
     }
 
-    // Search by keyword in short description or featuresAvailable
+    // com.accessiblelife.search.Search by keyword in short description or featuresAvailable
     public List<Place> searchByKeyword(String keyword)
     {
         return places.stream()
@@ -46,7 +48,7 @@ public class Search
                 .collect(Collectors.toList());
     }
 
-    // Search for verified places only
+    // com.accessiblelife.search.Search for verified places only
     public List<Place> searchVerifiedPlaces()
     {
         return places.stream()

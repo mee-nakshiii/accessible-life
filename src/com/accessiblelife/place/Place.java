@@ -1,3 +1,5 @@
+package com.accessiblelife.place;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +46,7 @@ public class Place {
 
 
     public void viewDetails() {
-        System.out.println("----- Place Details -----");
+        System.out.println("----- com.accessiblelife.place.Place Details -----");
         System.out.println("Location: " + location);
         System.out.println("Address: " + specificAddress);
         System.out.println("Description: " + shortDescription);
@@ -62,33 +64,33 @@ public class Place {
 
     public void addPlace() {
         this.addNewPlace = true;
-        System.out.println("Place successfully added: " + shortDescription);
+        System.out.println("com.accessiblelife.place.Place successfully added: " + shortDescription);
     }
 
 
     public void editPlace(String newDescription, String newFeatures) {
         this.shortDescription = newDescription;
         this.featuresAvailable = newFeatures;
-        System.out.println("Place updated successfully: " + shortDescription);
+        System.out.println("com.accessiblelife.place.Place updated successfully: " + shortDescription);
     }
 
 
     public void deletePlace() {
         this.deletePlace = true;
-        System.out.println("Place deleted successfully: " + shortDescription);
+        System.out.println("com.accessiblelife.place.Place deleted successfully: " + shortDescription);
     }
 
 
     public void verifyPlace() {
         this.isVerified = true;
         this.verificationVote++;
-        System.out.println("Place verified successfully: " + shortDescription);
+        System.out.println("com.accessiblelife.place.Place verified successfully: " + shortDescription);
     }
 
 
     public void reportPlace(String reason) {
         this.reportCount++;
-        System.out.println("Place reported. Reason: " + reason);
+        System.out.println("com.accessiblelife.place.Place reported. Reason: " + reason);
     }
 
 
