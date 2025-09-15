@@ -37,7 +37,7 @@ public class Admin extends User{
     }
     public void editAnyPlace(Place place, String newDescription) {
         System.out.println("Editing any place:"+place.getName());
-        place.setDescription(newDescription);
+        place.setshortDescription(newDescription);
         actionLog = "Edited place:"+place.getName();
     }
 
