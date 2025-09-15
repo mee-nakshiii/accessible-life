@@ -96,7 +96,13 @@ public class Place {
     public List<Place> getAccessiblePlaceNearby() {
         return accessiblePlaceNearby;
     }
+    public String getName() {
+        return name;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
     public void setAccessiblePlaceNearby(List<Place> accessiblePlaceNearby) {
         this.accessiblePlaceNearby = accessiblePlaceNearby;
     }
@@ -117,11 +123,11 @@ public class Place {
         this.specificAddress = specificAddress;
     }
 
-    public String getShortDescription() {
+    public String getshortDescription() {
         return shortDescription;
     }
 
-    public void setShortDescription(String shortDescription) {
+    public void setshortDescription(String shortDescription) {
         this.shortDescription = shortDescription;
     }
 
