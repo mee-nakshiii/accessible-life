@@ -1,4 +1,6 @@
-    import java.util.List;
+package com.accessiblelife.model;
+
+import java.util.List;
     public class User {
         private String name;
         private String userID;

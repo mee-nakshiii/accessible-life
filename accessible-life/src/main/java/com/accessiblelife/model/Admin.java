@@ -1,3 +1,5 @@
+package com.accessiblelife.model;
+
 import java.util.ArrayList;
 import java.util.List;
 public class Admin extends User{
@@ -28,8 +30,8 @@ public class Admin extends User{
         actionLog = "Approved place: " + place.getName();
     }
     public void deleteUser(User user){
-        System.out.println("Deleting User:"+user.getName());
-        actionLog="Deleted User:"+user.getName();
+        System.out.println("Deleting com.accessiblelife.model.User:"+user.getName());
+        actionLog="Deleted com.accessiblelife.model.User:"+user.getName();
     }
     public void viewReports() {
         System.out.println("Assigned reports: " + assignedReports);

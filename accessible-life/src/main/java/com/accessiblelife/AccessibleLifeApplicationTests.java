@@ -1,4 +1,4 @@
-package com.accessiblelife.accessible_life;
+package com.accessiblelife;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

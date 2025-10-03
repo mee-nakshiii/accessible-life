@@ -24,7 +24,7 @@ public class UserDAO {
 
             int rowsAffected = ps.executeUpdate();
 
-            // Set the generated ID back onto the User object (using String setter)
+            // Set the generated ID back onto the com.accessiblelife.model.User object (using String setter)
             if (rowsAffected > 0) {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) {

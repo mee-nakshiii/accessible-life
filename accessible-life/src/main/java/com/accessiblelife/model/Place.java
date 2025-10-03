@@ -1,3 +1,4 @@
+package com.accessiblelife.model;
 import java.util.ArrayList;
 import java.util.List;
 
