@@ -2,6 +2,7 @@ package com.accessiblelife.controller;
 
 import com.accessiblelife.model.RatingReview;
 import com.accessiblelife.service.ReviewService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,22 +11,27 @@ import java.util.List;
 @RequestMapping("/reviews")
 public class ReviewController {
 
-    private ReviewService reviewService = new ReviewService();
+    @Autowired
+    private ReviewService reviewService;
 
     @PostMapping("/add")
-    public boolean addReview(@RequestParam int placeId, @RequestParam int userId,
-                             @RequestBody RatingReview review) {
-        return reviewService.addReview(placeId, userId, review);
+    public RatingReview addReview(@RequestBody RatingReview review, @RequestParam Long placeId) {
+        return reviewService.addReview(review, placeId);
     }
 
     @GetMapping("/list")
-    public List<RatingReview> listReviews(@RequestParam int placeId) {
-        return reviewService.getReviews(placeId);
+    public List<RatingReview> getAllReviews() {
+        return reviewService.getAllReviews();
     }
 
     @GetMapping("/average")
-    public double averageRating(@RequestParam int placeId) {
+    public double getAverageRating(@RequestParam Long placeId) {
         return reviewService.getAverageRating(placeId);
     }
-}
+    // Get reviews for a specific place
+    @GetMapping("/place/{placeId}")
+    public List<RatingReview> getReviewsForPlace(@PathVariable Long placeId) {
+        return reviewService.getReviewsForPlace(placeId);
+    }
 
+}

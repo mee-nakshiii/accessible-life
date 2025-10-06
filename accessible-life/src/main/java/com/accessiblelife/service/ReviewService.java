@@ -1,48 +1,44 @@
 package com.accessiblelife.service;
 
-import com.accessiblelife.dao.ReviewDAO;
-import com.accessiblelife.RatingReview;
+import com.accessiblelife.model.Place;
+import com.accessiblelife.model.RatingReview;
+import com.accessiblelife.repository.PlaceRepository;
+import com.accessiblelife.repository.ReviewRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class ReviewService {
 
-    private ReviewDAO reviewDAO;
+    @Autowired
+    private ReviewRepository reviewRepository;
 
-    public ReviewService() {
-        this.reviewDAO = new ReviewDAO();
-    }
+    @Autowired
+    private PlaceRepository placeRepository;
 
-    /**
-     * Add a new review for a place
-     * @param placeId ID of the place
-     * @param userId ID of the user posting review
-     * @param review RatingReview object
-     * @return true if added successfully
-     */
-    public boolean addReview(int placeId, int userId, RatingReview review) {
-        if (review == null || review.getRating() < 1 || review.getRating() > 5 || review.getReview() == null) {
-            return false; // validation
+    public RatingReview addReview(RatingReview review, Long placeId) {
+        Place place = placeRepository.findById(placeId).orElse(null);
+        if (place != null) {
+            review.setPlace(place);
+            return reviewRepository.save(review);
         }
-        return reviewDAO.addReview(placeId, userId, review);
+        return null;
     }
 
-    /**
-     * Fetch all reviews for a place
-     * @param placeId ID of the place
-     * @return list of RatingReview objects
-     */
-    public List<RatingReview> getReviews(int placeId) {
-        return reviewDAO.fetchReviews(placeId);
+    public List<RatingReview> getAllReviews() {
+        return reviewRepository.findAll();
     }
 
-    /**
-     * Calculate average rating of a place
-     * @param placeId ID of the place
-     * @return average rating (0.0 if no reviews)
-     */
-    public double getAverageRating(int placeId) {
-        return reviewDAO.getAverageRating(placeId);
+    public double getAverageRating(Long placeId) {
+        return reviewRepository.findByPlaceId(placeId).stream()
+                .mapToInt(RatingReview::getRating)
+                .average()
+                .orElse(0);
+    }
+
+    public List<RatingReview> getReviewsForPlace(Long placeId) {
+        return reviewRepository.findByPlaceId(placeId);
     }
 }
-

@@ -2,38 +2,42 @@ package com.accessiblelife.service;
 
 import com.accessiblelife.dao.UserDAO;
 import com.accessiblelife.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
+@Service
 public class UserService {
 
+    @Autowired
     private UserDAO userDAO;
 
-    public UserService() {
-        this.userDAO = new UserDAO();
+    // Register a new user
+    /*public User registerUser(User user) {
+        return userDAO.registerUser(user);
+    }*/
+    // Register a new user
+    public User registerUser(User user) {
+        // Check if email already exists
+        if (userDAO.findByEmail(user.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already registered");
+        }
+        return userDAO.registerUser(user);
     }
 
-    /**
-     * Register a new user
-     * @param user com.accessiblelife.model.User object with name, email, password, location
-     * @return true if registration successful
-     */
-    public boolean registerUser(User user) {
-        if (user == null || user.getEmail() == null || user.getPassword() == null || user.getName() == null) {
-            return false; // basic validation
-        }
-        // TODO: You can hash the password here before saving
-        return userDAO.register(user);
+
+    // Login method
+    public User login(String email, String passwordHash) {
+        Optional<User> optionalUser = userDAO.findByEmailAndPasswordHash(email, passwordHash);
+        return optionalUser.orElse(null);
     }
 
-    /**
-     * Login a user with email and password
-     * @param email com.accessiblelife.model.User email
-     * @param password com.accessiblelife.model.User password
-     * @return com.accessiblelife.model.User object if login successful, null otherwise
-     */
-    public User loginUser(String email, String password) {
-        if (email == null || password == null) {
-            return null;
-        }
-        return userDAO.login(email, password);
+    // Find user by ID
+    public User getUserById(Long id) {
+        Optional<User> optionalUser = userDAO.findById(id);
+        return optionalUser.orElse(null);
     }
 }
+
+  // <-- only closing brace of class
