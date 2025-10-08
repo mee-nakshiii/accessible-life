@@ -6,6 +6,14 @@ import jakarta.validation.constraints.NotBlank;
 @Entity
 @Table(name = "places") // <-- THIS is important
 public class Place {
+    public Place(String name, String address) {
+        this.placeName = name;
+        this.specificAddress = address;
+    }
+
+    public String getName() {
+        return placeName;
+    }
 
     /*@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
