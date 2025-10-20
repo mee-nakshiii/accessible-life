@@ -6,40 +6,73 @@ import javax.swing.*;
 import java.awt.*;
 
 public class AdminDashboard extends JFrame {
-    public AdminDashboard(User user) {
-        // Apply modern look (optional: FlatLaf or custom UIManager tweaks)
-        setTitle("Admin Dashboard");
-        setUndecorated(true); // Removes window borders
 
-        // Full screen setup
-        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        if (gd.isFullScreenSupported()) {
-            gd.setFullScreenWindow(this);
-        } else {
-            setExtendedState(JFrame.MAXIMIZED_BOTH);
+    // --- THEME COLORS ---
+    private static final Color BG_COLOR = ThemeColors.BG_PRIMARY;
+    private static final Color TEXT_COLOR = ThemeColors.TEXT_PRIMARY;
+
+    public AdminDashboard(User user) {
+        setTitle("Admin Dashboard");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            System.err.println("Could not set system look and feel for Admin Dashboard.");
         }
 
-        // Welcome message
-        JLabel welcomeLabel = new JLabel("Welcome, Admin " + user.getName(), SwingConstants.CENTER);
-        welcomeLabel.setFont(new Font("SansSerif", Font.BOLD, 36));
-        welcomeLabel.setForeground(new Color(40, 40, 40));
+        getContentPane().setBackground(BG_COLOR);
+        setLayout(new GridBagLayout());
 
-        // Placeholder panel for future dashboard features
-        JPanel dashboardPanel = new JPanel();
-        dashboardPanel.setLayout(new BoxLayout(dashboardPanel, BoxLayout.Y_AXIS));
-        dashboardPanel.setOpaque(false);
-        dashboardPanel.add(Box.createVerticalStrut(50)); // spacing
-        dashboardPanel.add(welcomeLabel);
-        dashboardPanel.add(Box.createVerticalGlue());
+        // --- Main Admin Card (Centralized) ---
+        JPanel adminCard = new JPanel();
+        adminCard.setLayout(new BoxLayout(adminCard, BoxLayout.Y_AXIS));
+        adminCard.setBackground(ThemeColors.CARD_BG);
+        adminCard.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(ThemeColors.BORDER_GRAY, 1),
+                BorderFactory.createEmptyBorder(60, 100, 60, 100)
+        ));
 
-        // Wrap everything
-        setLayout(new BorderLayout());
-        add(dashboardPanel, BorderLayout.CENTER);
+        // Welcome Header
+        JLabel welcomeLabel = new JLabel("Welcome, Administrator, " + user.getName(), SwingConstants.CENTER);
+        welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 36));
+        welcomeLabel.setForeground(ThemeColors.ACCENT_PRIMARY);
+        welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        welcomeLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 40, 0));
 
-        // ESC key to exit full screen
-        getRootPane().registerKeyboardAction(e -> System.exit(0),
-                KeyStroke.getKeyStroke("ESCAPE"),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
+        // Buttons (using ThemeButton for visual elegance)
+        JButton manageUsersBtn = ThemeButton.createPrimary("👤 Manage Users", ThemeColors.ACCENT_PRIMARY);
+        manageUsersBtn.setMaximumSize(new Dimension(300, 55));
+
+        JButton managePlacesBtn = ThemeButton.createPrimary("📍 Manage Places", ThemeColors.ACCENT_PRIMARY);
+        managePlacesBtn.setMaximumSize(new Dimension(300, 55));
+
+        JButton logoutBtn = ThemeButton.createPrimary("🚪 Logout", ThemeColors.LOGOUT_RED);
+        logoutBtn.setMaximumSize(new Dimension(300, 55));
+
+        // Layout
+        adminCard.add(welcomeLabel);
+        adminCard.add(manageUsersBtn);
+        adminCard.add(Box.createVerticalStrut(20));
+        adminCard.add(managePlacesBtn);
+        adminCard.add(Box.createVerticalStrut(40));
+        adminCard.add(logoutBtn);
+
+        add(adminCard, new GridBagConstraints());
+
+        // --- ACTION LISTENERS ---
+
+        manageUsersBtn.addActionListener(e -> new ManageUsersForm().setVisible(true));
+
+        managePlacesBtn.addActionListener(e -> new AddPlaceForm().setVisible(true));
+
+        logoutBtn.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "Admin logged out successfully!", "Logout", JOptionPane.INFORMATION_MESSAGE);
+            this.dispose();
+            // CORRECT FIX: Chaining .setVisible(true) properly
+            new LoginPage().setVisible(true);
+        });
 
         setVisible(true);
     }

@@ -12,6 +12,9 @@
     <description>Accessible Life desktop app with Swing and MySQL</description>
 
     <properties>
+        <!-- CRITICAL FIX: Explicitly set character encoding to UTF-8 to resolve
+             "unmappable character" errors during compilation. -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
@@ -43,10 +46,11 @@
             <version>2.15.2</version>
         </dependency>
 
-        <!-- MySQL JDBC driver -->
+        <!-- MySQL JDBC driver (Updated to use the correct Maven coordinates,
+             which resolves the artifact relocation warning). -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
             <version>8.0.33</version>
         </dependency>
     </dependencies>
@@ -61,6 +65,8 @@
                 <configuration>
                     <source>17</source>
                     <target>17</target>
+                    <!-- Optional: Ensure compiler uses UTF-8 -->
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
         </plugins>

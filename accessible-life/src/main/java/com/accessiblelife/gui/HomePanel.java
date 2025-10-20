@@ -4,52 +4,81 @@ import javax.swing.*;
 import java.awt.*;
 
 public class HomePanel extends JPanel {
-    private MainWindow parent;
+
+    private final MainWindow parent;
 
     public HomePanel(MainWindow parent, String userName) {
         this.parent = parent;
 
-        setBackground(new Color(240, 248, 255)); // AliceBlue
+        setBackground(ThemeColors.BG_PRIMARY);
         setLayout(new BorderLayout());
 
-        // Welcome label
-        JLabel welcome = new JLabel("Welcome, " + userName, SwingConstants.CENTER);
-        welcome.setFont(new Font("Segoe UI", Font.BOLD, 32));
-        welcome.setBorder(BorderFactory.createEmptyBorder(40, 0, 20, 0));
-        add(welcome, BorderLayout.NORTH);
+        // --- 1. Main Welcome/Title ---
+        JLabel title = new JLabel("Application Dashboard", SwingConstants.CENTER);
+        title.setFont(new Font("Segoe UI", Font.BOLD, 36));
+        title.setForeground(ThemeColors.TEXT_PRIMARY);
+        title.setBorder(BorderFactory.createEmptyBorder(30, 0, 10, 0));
 
-        // Button panel with vertical layout
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-        buttonPanel.setBackground(new Color(240, 248, 255));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(50, 300, 50, 300));
+        // --- 2. Central Content Card (Centered) ---
+        JPanel contentPanel = new JPanel(new GridBagLayout());
+        contentPanel.setBackground(ThemeColors.BG_PRIMARY);
 
-        // Buttons
-        JButton searchBtn = createStyledButton("🔍 Search Places");
-        JButton reviewBtn = createStyledButton("✍️ Add Review");
-        JButton logoutBtn = createStyledButton("🚪 Logout");
+        JPanel featureCard = new JPanel();
+        featureCard.setLayout(new BoxLayout(featureCard, BoxLayout.Y_AXIS));
+        featureCard.setBackground(ThemeColors.CARD_BG); // White Card
 
-        // Add spacing and buttons
-        buttonPanel.add(Box.createVerticalGlue());
-        buttonPanel.add(searchBtn);
-        buttonPanel.add(Box.createVerticalStrut(20));
-        buttonPanel.add(reviewBtn);
-        buttonPanel.add(Box.createVerticalStrut(20));
-        buttonPanel.add(logoutBtn);
-        buttonPanel.add(Box.createVerticalGlue());
+        // Soft border for the card
+        featureCard.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(ThemeColors.BORDER_GRAY, 1),
+                BorderFactory.createEmptyBorder(60, 60, 60, 60)
+        ));
 
-        add(buttonPanel, BorderLayout.CENTER);
-    }
+        // --- Components for the Card ---
+        JLabel instruction = new JLabel("Main Features", SwingConstants.CENTER);
+        instruction.setFont(new Font("Segoe UI", Font.BOLD, 26));
+        instruction.setForeground(ThemeColors.TEXT_PRIMARY);
+        instruction.setAlignmentX(Component.CENTER_ALIGNMENT);
+        instruction.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
 
-    private JButton createStyledButton(String text) {
-        JButton button = new JButton(text);
-        button.setFont(new Font("Segoe UI", Font.PLAIN, 20));
-        button.setBackground(new Color(100, 149, 237)); // CornflowerBlue
-        button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-        button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button.setMaximumSize(new Dimension(300, 50));
-        return button;
+        // Search field (for quick search visual)
+        JTextField searchField = new JTextField("Find accessible places...");
+        searchField.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        searchField.setForeground(ThemeColors.TEXT_PRIMARY);
+        searchField.setMaximumSize(new Dimension(350, 40));
+        searchField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(ThemeColors.BORDER_GRAY),
+                BorderFactory.createEmptyBorder(8, 10, 8, 10)
+        ));
+        searchField.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Buttons using ThemeButton for high contrast
+        JButton searchBtn = ThemeButton.createPrimary("🔍 Search Accessible Places", ThemeColors.ACCENT_PRIMARY);
+        searchBtn.setMaximumSize(new Dimension(350, 55));
+
+        JButton reviewBtn = ThemeButton.createPrimary("✍️ Submit a Review", ThemeColors.ACCENT_PRIMARY);
+        reviewBtn.setMaximumSize(new Dimension(350, 55));
+
+
+        // Add components to the card
+        featureCard.add(instruction);
+        featureCard.add(searchField);
+        featureCard.add(Box.createVerticalStrut(30));
+        featureCard.add(searchBtn);
+        featureCard.add(Box.createVerticalStrut(15));
+        featureCard.add(reviewBtn);
+
+        contentPanel.add(featureCard);
+
+        // Add components to the MainPanel
+        JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        northPanel.setBackground(ThemeColors.BG_PRIMARY);
+        northPanel.add(title);
+
+        add(northPanel, BorderLayout.NORTH);
+        add(contentPanel, BorderLayout.CENTER);
+
+        // --- ACTION LISTENERS ---
+        searchBtn.addActionListener(e -> new SearchByFeature().setVisible(true));
+        reviewBtn.addActionListener(e -> parent.showPanel("review"));
     }
 }

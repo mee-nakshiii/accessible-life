@@ -4,6 +4,8 @@ import com.accessiblelife.db.DatabaseManager;
 import com.accessiblelife.model.User;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserRepository {
 
@@ -26,7 +28,7 @@ public class UserRepository {
                         rs.getLong("user_id"),
                         rs.getString("name"),
                         rs.getString("email"),
-                        rs.getString("password_hash"), // ✅ FIXED
+                        rs.getString("password_hash"),
                         rs.getBoolean("is_admin")
                 );
             }
@@ -46,7 +48,7 @@ public class UserRepository {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO users (name, email, password_hash, is_admin) VALUES (?, ?, ?, ?)")) { // ✅ FIXED
+                "INSERT INTO users (name, email, password_hash, is_admin) VALUES (?, ?, ?, ?)")) {
 
             stmt.setString(1, user.getName());
             stmt.setString(2, user.getEmail());
@@ -59,5 +61,32 @@ public class UserRepository {
             e.printStackTrace();
             return false;
         }
+    }
+
+    // NEW METHOD: Retrieve all users for Admin panel
+    public List<User> findAllUsers() {
+        List<User> users = new ArrayList<>();
+        Connection conn = DatabaseManager.getConnection();
+        if (conn == null) return users;
+
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT user_id, name, email, is_admin FROM users")) {
+
+            while (rs.next()) {
+                // Note: password_hash is omitted for security when fetching all users
+                User user = new User(
+                        rs.getLong("user_id"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        null, // Password is not retrieved
+                        rs.getBoolean("is_admin")
+                );
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ SQL error while fetching all users:");
+            e.printStackTrace();
+        }
+        return users;
     }
 }

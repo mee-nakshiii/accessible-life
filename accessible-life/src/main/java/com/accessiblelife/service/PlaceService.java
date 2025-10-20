@@ -6,13 +6,23 @@ import com.accessiblelife.repository.PlaceRepository;
 import java.util.List;
 
 public class PlaceService {
-    private final PlaceRepository placeRepo = new PlaceRepository();
+    private final PlaceRepository placeRepository = new PlaceRepository();
 
-    public List<Place> fetchAllPlaces() {
-        return placeRepo.getAllPlaces();
+    public List<Place> getAllPlaces() {
+        return placeRepository.getAllPlaces();
     }
 
-    public Place createPlace(long id, String name, String description, String location, String category) {
-        return new Place(id, name, description, location, category);
+    public List<Place> searchPlacesByFeatures(boolean ramp, boolean toilet, boolean braille, boolean elevator) {
+        return placeRepository.searchPlacesByFeatures(ramp, toilet, braille, elevator);
+    }
+
+    // NEW METHOD: Save a new place (called from the GUI)
+    public boolean savePlace(Place place) {
+        // Basic validation before saving
+        if (place.getName().trim().isEmpty() || place.getLocation().trim().isEmpty()) {
+            System.err.println("Place name and location cannot be empty.");
+            return false;
+        }
+        return placeRepository.savePlace(place);
     }
 }

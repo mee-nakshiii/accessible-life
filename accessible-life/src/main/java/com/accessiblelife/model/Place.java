@@ -2,60 +2,52 @@ package com.accessiblelife.model;
 
 public class Place {
     private long id;
-    private String placeName;
+    private String name;
     private String description;
     private String location;
     private String category;
 
-    public Place(long id, String placeName, String description, String location, String category) {
+    private boolean hasRamp;
+    private boolean hasAccessibleToilet;
+    private boolean hasBrailleSignage;
+    private boolean hasElevator;
+
+    // Full 9-argument constructor (used when fetching from DB)
+    public Place(long id, String name, String description, String location, String category,
+                 boolean hasRamp, boolean hasAccessibleToilet, boolean hasBrailleSignage, boolean hasElevator) {
         this.id = id;
-        this.placeName = placeName;
+        this.name = name;
         this.description = description;
         this.location = location;
         this.category = category;
+        this.hasRamp = hasRamp;
+        this.hasAccessibleToilet = hasAccessibleToilet;
+        this.hasBrailleSignage = hasBrailleSignage;
+        this.hasElevator = hasElevator;
     }
 
-    public long getId() {
-        return id;
+    // FIX: 8-argument constructor for NEW places (ID is 0 for DB auto-generation)
+    public Place(String name, String description, String location, String category,
+                 boolean hasRamp, boolean hasAccessibleToilet, boolean hasBrailleSignage, boolean hasElevator) {
+        this(0, name, description, location, category, hasRamp, hasAccessibleToilet, hasBrailleSignage, hasElevator);
     }
 
-    public String getName() {
-        return placeName; // or placeName, depending on your field
+    // Minimal constructor for places without full features (e.g., initial creation)
+    // NOTE: This will likely be unused now, but is kept for robustness.
+    public Place(String name, String description, String location, String category) {
+        this(0, name, description, location, category, false, false, false, false);
     }
 
-    public String getPlaceName() {
-        return placeName;
-    }
+    // Getters
+    public long getId() { return id; }
+    public String getName() { return name; }
+    public String getDescription() { return description; }
+    public String getLocation() { return location; }
+    public String getCategory() { return category; }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void setPlaceName(String placeName) {
-        this.placeName = placeName;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
+    // Feature Getters
+    public boolean isHasRamp() { return hasRamp; }
+    public boolean isHasAccessibleToilet() { return hasAccessibleToilet; }
+    public boolean isHasBrailleSignage() { return hasBrailleSignage; }
+    public boolean isHasElevator() { return hasElevator; }
 }

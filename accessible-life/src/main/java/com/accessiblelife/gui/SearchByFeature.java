@@ -1,15 +1,32 @@
 package com.accessiblelife.gui;
 
-import com.accessiblelife.db.DatabaseManager;
+import com.accessiblelife.model.Place;
+import com.accessiblelife.service.PlaceService;
 
 import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
+import java.util.List;
 
 public class SearchByFeature extends JFrame {
+
+    private final PlaceService placeService = new PlaceService();
+
+    // --- THEME COLORS ---
+    private static final Color BG_COLOR = new Color(240, 255, 240); // Honeydew
+    private static final Color ACCENT_COLOR = new Color(144, 238, 144); // Light Green
+    private static final Color TEXT_COLOR = new Color(47, 79, 79); // Dark Slate Gray
+    private static final Color FIELD_BORDER = new Color(180, 180, 180);
+
+    private JCheckBox rampBox;
+    private JCheckBox toiletBox;
+    private JCheckBox brailleBox;
+    private JCheckBox elevatorBox;
+    private JTextArea resultsArea;
+
     public SearchByFeature() {
         setTitle("Search by Accessibility Features");
-        setUndecorated(true); // Remove window borders
+        setUndecorated(true);
 
         // Full screen setup
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -19,85 +36,77 @@ public class SearchByFeature extends JFrame {
             setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 
-        getContentPane().setBackground(new Color(240, 248, 255)); // AliceBlue
+        getContentPane().setBackground(BG_COLOR);
         setLayout(new BorderLayout());
 
         // Title
         JLabel title = new JLabel("Search Places by Accessibility Features", SwingConstants.CENTER);
-        title.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        title.setFont(new Font("Segoe UI", Font.BOLD, 36));
+        title.setForeground(ACCENT_COLOR);
         title.setBorder(BorderFactory.createEmptyBorder(30, 0, 20, 0));
         add(title, BorderLayout.NORTH);
 
         // Filter panel
-        JPanel filterPanel = new JPanel(new GridLayout(2, 2, 20, 20));
-        filterPanel.setBackground(new Color(240, 248, 255));
-        filterPanel.setBorder(BorderFactory.createEmptyBorder(20, 100, 20, 100));
+        JPanel filterPanel = new JPanel(new GridLayout(2, 2, 40, 40));
+        filterPanel.setBackground(BG_COLOR);
+        filterPanel.setBorder(BorderFactory.createEmptyBorder(40, 150, 40, 150));
 
-        JCheckBox rampBox = new JCheckBox("Has Ramp");
-        JCheckBox toiletBox = new JCheckBox("Accessible Toilet");
-        JCheckBox brailleBox = new JCheckBox("Braille Signage");
-        JCheckBox elevatorBox = new JCheckBox("Elevator");
+        rampBox = createStyledCheckBox("Has Ramp");
+        toiletBox = createStyledCheckBox("Accessible Toilet");
+        brailleBox = createStyledCheckBox("Braille Signage");
+        elevatorBox = createStyledCheckBox("Elevator");
 
-        for (JCheckBox box : new JCheckBox[]{rampBox, toiletBox, brailleBox, elevatorBox}) {
-            box.setFont(new Font("Segoe UI", Font.PLAIN, 18));
-            filterPanel.add(box);
-        }
+        filterPanel.add(rampBox);
+        filterPanel.add(toiletBox);
+        filterPanel.add(brailleBox);
+        filterPanel.add(elevatorBox);
 
         // Results area
-        JTextArea results = new JTextArea();
-        results.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        results.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(results);
-        scrollPane.setBorder(BorderFactory.createTitledBorder("Search Results"));
+        resultsArea = new JTextArea();
+        resultsArea.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        resultsArea.setEditable(false);
+        resultsArea.setForeground(TEXT_COLOR);
+        JScrollPane scrollPane = new JScrollPane(resultsArea);
+        scrollPane.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(TEXT_COLOR), "Search Results",
+                0, 0, new Font("Segoe UI", Font.BOLD, 16), TEXT_COLOR));
 
         // Search button
-        JButton searchBtn = new JButton("Search");
-        searchBtn.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        searchBtn.setBackground(new Color(100, 149, 237)); // CornflowerBlue
-        searchBtn.setForeground(Color.WHITE);
-        searchBtn.setFocusPainted(false);
-        searchBtn.setPreferredSize(new Dimension(200, 50));
+        JButton searchBtn = createStyledButton("Search", ACCENT_COLOR, Color.WHITE);
+        searchBtn.setPreferredSize(new Dimension(250, 50));
         searchBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JButton closeBtn = createStyledButton("Close", new Color(180, 180, 180), TEXT_COLOR);
+        closeBtn.setPreferredSize(new Dimension(250, 50));
+        closeBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.setBackground(new Color(240, 248, 255));
+        centerPanel.setBackground(BG_COLOR);
         centerPanel.add(filterPanel);
+
+        JPanel buttonRow = new JPanel();
+        buttonRow.setBackground(BG_COLOR);
+        buttonRow.add(searchBtn);
+        buttonRow.add(Box.createHorizontalStrut(20));
+        buttonRow.add(closeBtn);
+
+        centerPanel.add(buttonRow);
         centerPanel.add(Box.createVerticalStrut(20));
-        centerPanel.add(searchBtn);
-        centerPanel.add(Box.createVerticalStrut(20));
-        centerPanel.add(scrollPane);
+
+        JPanel scrollWrapper = new JPanel(new BorderLayout());
+        scrollWrapper.setBackground(BG_COLOR);
+        scrollWrapper.setBorder(BorderFactory.createEmptyBorder(0, 100, 50, 100));
+        scrollWrapper.add(scrollPane, BorderLayout.CENTER);
+
+        centerPanel.add(scrollWrapper);
 
         add(centerPanel, BorderLayout.CENTER);
 
-        // Action listener
-        searchBtn.addActionListener(e -> {
-            StringBuilder query = new StringBuilder("SELECT place_name, location, description FROM places WHERE 1=1");
+        // Action listener: Calls the PlaceService and updates the results area
+        searchBtn.addActionListener(e -> performSearch());
 
-            if (rampBox.isSelected()) query.append(" AND has_ramp = TRUE");
-            if (toiletBox.isSelected()) query.append(" AND has_accessible_toilet = TRUE");
-            if (brailleBox.isSelected()) query.append(" AND has_braille_signage = TRUE");
-            if (elevatorBox.isSelected()) query.append(" AND has_elevator = TRUE");
-
-            results.setText("");
-
-            try (Connection conn = DatabaseManager.getConnection();
-                 Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery(query.toString())) {
-
-                while (rs.next()) {
-                    results.append(rs.getString("place_name") + " - " + rs.getString("location") + "\n" +
-                            rs.getString("description") + "\n\n");
-                }
-
-                if (results.getText().isEmpty()) {
-                    results.setText("No places found with selected features.");
-                }
-
-            } catch (SQLException ex) {
-                results.setText("Error: " + ex.getMessage());
-            }
-        });
+        closeBtn.addActionListener(e -> dispose());
 
         // ESC key to exit full screen
         getRootPane().registerKeyboardAction(e -> dispose(),
@@ -105,5 +114,56 @@ public class SearchByFeature extends JFrame {
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         setVisible(true);
+    }
+
+    private void performSearch() {
+        resultsArea.setText("");
+
+        try {
+            List<Place> results = placeService.searchPlacesByFeatures(
+                    rampBox.isSelected(),
+                    toiletBox.isSelected(),
+                    brailleBox.isSelected(),
+                    elevatorBox.isSelected()
+            );
+
+            if (results.isEmpty()) {
+                resultsArea.setText("No accessible places found matching your criteria.");
+            } else {
+                StringBuilder sb = new StringBuilder("--- Found " + results.size() + " Places ---\n\n");
+                for (Place place : results) {
+                    sb.append("📍 ").append(place.getName()).append(" (").append(place.getCategory()).append(")\n");
+                    sb.append("   Location: ").append(place.getLocation()).append("\n");
+                    sb.append("   Description: ").append(place.getDescription()).append("\n\n");
+                }
+                resultsArea.setText(sb.toString());
+            }
+
+        } catch (Exception ex) {
+            resultsArea.setText("Error during search: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+    private JCheckBox createStyledCheckBox(String text) {
+        JCheckBox box = new JCheckBox(text);
+        box.setFont(new Font("Segoe UI", Font.PLAIN, 20));
+        box.setBackground(BG_COLOR);
+        box.setForeground(TEXT_COLOR);
+        return box;
+    }
+
+    private JButton createStyledButton(String text, Color bg, Color fg) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        button.setBackground(bg);
+        button.setForeground(fg);
+        button.setFocusPainted(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(60, 179, 113), 2),
+                BorderFactory.createEmptyBorder(10, 25, 10, 25)
+        ));
+        return button;
     }
 }
