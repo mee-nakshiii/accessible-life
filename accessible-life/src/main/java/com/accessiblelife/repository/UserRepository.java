@@ -15,7 +15,7 @@ public class UserRepository {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement(
-                "SELECT * FROM users WHERE email = ? AND password = ?")){
+                "SELECT * FROM users WHERE email = ? AND password_hash = ?")) {
 
             stmt.setString(1, email.trim());
             stmt.setString(2, password.trim());
@@ -26,7 +26,7 @@ public class UserRepository {
                         rs.getLong("user_id"),
                         rs.getString("name"),
                         rs.getString("email"),
-                        rs.getString("password"),
+                        rs.getString("password_hash"), // ✅ FIXED
                         rs.getBoolean("is_admin")
                 );
             }
@@ -46,7 +46,7 @@ public class UserRepository {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO users (name, email, password, is_admin) VALUES (?, ?, ?, ?)")) {
+                "INSERT INTO users (name, email, password_hash, is_admin) VALUES (?, ?, ?, ?)")) { // ✅ FIXED
 
             stmt.setString(1, user.getName());
             stmt.setString(2, user.getEmail());
