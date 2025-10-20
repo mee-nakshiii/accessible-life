@@ -1,39 +1,52 @@
 package com.accessiblelife.gui;
 
-import com.accessiblelife.api.ApiClient;
+import com.accessiblelife.model.User;
+import com.accessiblelife.service.UserService;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class LoginPage extends JPanel {
-    public LoginPage(MainGUI mainGUI) {
-        setLayout(new GridLayout(4, 2, 10, 10));
+public class LoginPage {
+    private JFrame frame;
+    private JTextField emailField;
+    private JPasswordField passwordField;
+    private final UserService userService = new UserService();
 
-        JLabel emailLabel = new JLabel("Email:");
-        JTextField emailField = new JTextField();
+    public LoginPage() {
+        frame = new JFrame("Login");
+        frame.setSize(400, 300);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+        frame.setLayout(new GridLayout(0, 1, 10, 10));
 
-        JLabel passwordLabel = new JLabel("Password:");
-        JPasswordField passwordField = new JPasswordField();
+        emailField = new JTextField();
+        passwordField = new JPasswordField();
 
-        JButton loginButton = new JButton("Login");
-        JButton registerButton = new JButton("Go to Register");
+        JButton loginBtn = new JButton("Login");
 
-        loginButton.addActionListener(e -> {
-            String email = emailField.getText();
-            String password = new String(passwordField.getPassword());
+        frame.add(new JLabel("Email:"));
+        frame.add(emailField);
+        frame.add(new JLabel("Password:"));
+        frame.add(passwordField);
+        frame.add(loginBtn);
 
-            boolean success = ApiClient.login(email, password);
-            if (success) {
-                mainGUI.showPanel("Admin");
-            } else {
-                JOptionPane.showMessageDialog(this, "Login failed");
-            }
-        });
+        loginBtn.addActionListener(e -> attemptLogin());
 
-        registerButton.addActionListener(e -> mainGUI.showPanel("Register"));
+        frame.setVisible(true);
+    }
 
-        add(emailLabel); add(emailField);
-        add(passwordLabel); add(passwordField);
-        add(loginButton); add(registerButton);
+    private void attemptLogin() {
+        String email = emailField.getText().trim();
+        String password = new String(passwordField.getPassword()).trim();
+
+        User user = userService.login(email, password);
+
+        if (user != null) {
+            JOptionPane.showMessageDialog(frame, "Login successful!");
+            new MainWindow(user.getName()).setVisible(true);
+            frame.dispose();
+        } else {
+            JOptionPane.showMessageDialog(frame, "Invalid credentials. Try again.");
+        }
     }
 }

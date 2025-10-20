@@ -1,11 +1,9 @@
 package com.accessiblelife;
 
-import com.accessiblelife.gui.MainGUI;
-
-import javax.swing.*;
+import com.accessiblelife.gui.LoginPage;
 
 public class Main {
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new MainGUI());
+        javax.swing.SwingUtilities.invokeLater(LoginPage::new);
     }
 }
