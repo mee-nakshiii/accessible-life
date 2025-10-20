@@ -32,6 +32,3 @@ google-services.json
 
 # Android Profiling
 *.hprof
-/accessible-life/src/main/java/com/accessiblelife/gui/AddPlaceForm.java
-/accessible-life/src/main/java/com/accessiblelife/gui/ThemeButton.java
-/accessible-life/src/main/java/com/accessiblelife/gui/ThemeColors.java
