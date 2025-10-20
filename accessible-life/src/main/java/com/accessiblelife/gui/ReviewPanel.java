@@ -12,19 +12,47 @@ public class ReviewPanel extends JPanel {
 
     public ReviewPanel(MainWindow parent) {
         this.parent = parent;
-        setLayout(new GridLayout(0, 1));
+        setBackground(new Color(240, 248, 255)); // AliceBlue
+        setLayout(new GridBagLayout());
 
+        // Form panel
+        JPanel formPanel = new JPanel();
+        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
+        formPanel.setBackground(new Color(240, 248, 255));
+        formPanel.setBorder(BorderFactory.createEmptyBorder(50, 100, 50, 100));
+
+        JLabel title = new JLabel("Submit Your Review", SwingConstants.CENTER);
+        title.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        title.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
+
+        JLabel ratingLabel = new JLabel("Rating (1–5):");
+        ratingLabel.setFont(new Font("Segoe UI", Font.PLAIN, 18));
         JTextField ratingField = new JTextField();
-        JTextArea commentArea = new JTextArea();
+        ratingField.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        ratingField.setMaximumSize(new Dimension(400, 40));
 
-        add(new JLabel("Rating (1–5):"));
-        add(ratingField);
-        add(new JLabel("Comment:"));
-        add(new JScrollPane(commentArea));
+        JLabel commentLabel = new JLabel("Comment:");
+        commentLabel.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        JTextArea commentArea = new JTextArea(5, 40);
+        commentArea.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        JScrollPane commentScroll = new JScrollPane(commentArea);
+        commentScroll.setMaximumSize(new Dimension(400, 100));
 
         JButton submitBtn = new JButton("Submit Review");
-        JButton backBtn = new JButton("Back to Home");
+        submitBtn.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        submitBtn.setBackground(new Color(100, 149, 237)); // CornflowerBlue
+        submitBtn.setForeground(Color.WHITE);
+        submitBtn.setFocusPainted(false);
+        submitBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        submitBtn.setMaximumSize(new Dimension(200, 50));
 
+        JButton backBtn = new JButton("← Back to Home");
+        backBtn.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        backBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        backBtn.setMaximumSize(new Dimension(200, 40));
+
+        // Action listeners
         submitBtn.addActionListener(e -> {
             try {
                 int rating = Integer.parseInt(ratingField.getText().trim());
@@ -51,7 +79,18 @@ public class ReviewPanel extends JPanel {
 
         backBtn.addActionListener(e -> parent.showPanel("home"));
 
-        add(submitBtn);
-        add(backBtn);
+        // Add components to form panel
+        formPanel.add(title);
+        formPanel.add(ratingLabel);
+        formPanel.add(ratingField);
+        formPanel.add(Box.createVerticalStrut(15));
+        formPanel.add(commentLabel);
+        formPanel.add(commentScroll);
+        formPanel.add(Box.createVerticalStrut(30));
+        formPanel.add(submitBtn);
+        formPanel.add(Box.createVerticalStrut(10));
+        formPanel.add(backBtn);
+
+        add(formPanel, new GridBagConstraints());
     }
 }

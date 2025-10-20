@@ -9,12 +9,20 @@ public class MainWindow extends JFrame {
 
     public MainWindow(String userName) {
         setTitle("Accessible Life");
-        setSize(800, 600);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        setUndecorated(true); // Removes window borders
 
+        // Full screen setup
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        if (gd.isFullScreenSupported()) {
+            gd.setFullScreenWindow(this);
+        } else {
+            setExtendedState(JFrame.MAXIMIZED_BOTH);
+        }
+
+        // Main content panel with CardLayout
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
+        mainPanel.setBackground(new Color(240, 248, 255)); // AliceBlue
 
         // Panels
         HomePanel home = new HomePanel(this, userName);
@@ -27,6 +35,13 @@ public class MainWindow extends JFrame {
 
         add(mainPanel);
         cardLayout.show(mainPanel, "home");
+
+        // ESC key to exit full screen
+        getRootPane().registerKeyboardAction(e -> System.exit(0),
+                KeyStroke.getKeyStroke("ESCAPE"),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+        setVisible(true);
     }
 
     public void showPanel(String name) {

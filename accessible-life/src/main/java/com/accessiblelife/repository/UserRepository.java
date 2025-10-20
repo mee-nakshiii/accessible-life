@@ -7,7 +7,7 @@ import java.sql.*;
 
 public class UserRepository {
 
-    public User findByEmailAndPassword(String email, String passwordHash) {
+    public User findByEmailAndPassword(String email, String password) {
         Connection conn = DatabaseManager.getConnection();
         if (conn == null) {
             System.err.println("❌ Connection is null. Aborting login.");
@@ -15,10 +15,10 @@ public class UserRepository {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement(
-                "SELECT * FROM users WHERE email = ? AND password_hash = ?")) {
+                "SELECT * FROM users WHERE email = ? AND password = ?")){
 
             stmt.setString(1, email.trim());
-            stmt.setString(2, passwordHash.trim());
+            stmt.setString(2, password.trim());
 
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -26,7 +26,7 @@ public class UserRepository {
                         rs.getLong("user_id"),
                         rs.getString("name"),
                         rs.getString("email"),
-                        rs.getString("password_hash"),
+                        rs.getString("password"),
                         rs.getBoolean("is_admin")
                 );
             }
@@ -46,7 +46,7 @@ public class UserRepository {
         }
 
         try (PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO users (name, email, password_hash, is_admin) VALUES (?, ?, ?, ?)")) {
+                "INSERT INTO users (name, email, password, is_admin) VALUES (?, ?, ?, ?)")) {
 
             stmt.setString(1, user.getName());
             stmt.setString(2, user.getEmail());

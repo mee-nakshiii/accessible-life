@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class DatabaseManager {
     private static final String URL = "jdbc:mysql://127.0.0.1:3306/accessiblelifeapi";
     private static final String USER = "root";
-    private static final String PASSWORD = "mymas123"; // match your MySQL root password
+    private static final String PASSWORD = "@123MySQL123"; // match your MySQL root password
 
     public static Connection getConnection() {
         try {

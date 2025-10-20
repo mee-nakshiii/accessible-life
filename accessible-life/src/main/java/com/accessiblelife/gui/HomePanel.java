@@ -8,21 +8,48 @@ public class HomePanel extends JPanel {
 
     public HomePanel(MainWindow parent, String userName) {
         this.parent = parent;
-        setLayout(new GridLayout(0, 1, 10, 10));
 
+        setBackground(new Color(240, 248, 255)); // AliceBlue
+        setLayout(new BorderLayout());
+
+        // Welcome label
         JLabel welcome = new JLabel("Welcome, " + userName, SwingConstants.CENTER);
-        add(welcome);
+        welcome.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        welcome.setBorder(BorderFactory.createEmptyBorder(40, 0, 20, 0));
+        add(welcome, BorderLayout.NORTH);
 
-        JButton searchBtn = new JButton("Search Places");
-        JButton reviewBtn = new JButton("Add Review");
-        JButton logoutBtn = new JButton("Logout");
+        // Button panel with vertical layout
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.setBackground(new Color(240, 248, 255));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(50, 300, 50, 300));
 
-        searchBtn.addActionListener(e -> parent.showPanel("search"));
-        reviewBtn.addActionListener(e -> parent.showPanel("review"));
-        logoutBtn.addActionListener(e -> System.exit(0));
+        // Buttons
+        JButton searchBtn = createStyledButton("🔍 Search Places");
+        JButton reviewBtn = createStyledButton("✍️ Add Review");
+        JButton logoutBtn = createStyledButton("🚪 Logout");
 
-        add(searchBtn);
-        add(reviewBtn);
-        add(logoutBtn);
+        // Add spacing and buttons
+        buttonPanel.add(Box.createVerticalGlue());
+        buttonPanel.add(searchBtn);
+        buttonPanel.add(Box.createVerticalStrut(20));
+        buttonPanel.add(reviewBtn);
+        buttonPanel.add(Box.createVerticalStrut(20));
+        buttonPanel.add(logoutBtn);
+        buttonPanel.add(Box.createVerticalGlue());
+
+        add(buttonPanel, BorderLayout.CENTER);
+    }
+
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Segoe UI", Font.PLAIN, 20));
+        button.setBackground(new Color(100, 149, 237)); // CornflowerBlue
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button.setMaximumSize(new Dimension(300, 50));
+        return button;
     }
 }
