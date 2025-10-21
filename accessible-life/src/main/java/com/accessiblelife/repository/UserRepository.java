@@ -63,7 +63,6 @@ public class UserRepository {
         }
     }
 
-    // NEW METHOD: Retrieve all users for Admin panel
     public List<User> findAllUsers() {
         List<User> users = new ArrayList<>();
         Connection conn = DatabaseManager.getConnection();
@@ -73,12 +72,11 @@ public class UserRepository {
              ResultSet rs = stmt.executeQuery("SELECT user_id, name, email, is_admin FROM users")) {
 
             while (rs.next()) {
-                // Note: password_hash is omitted for security when fetching all users
                 User user = new User(
                         rs.getLong("user_id"),
                         rs.getString("name"),
                         rs.getString("email"),
-                        null, // Password is not retrieved
+                        null,
                         rs.getBoolean("is_admin")
                 );
                 users.add(user);
@@ -88,5 +86,26 @@ public class UserRepository {
             e.printStackTrace();
         }
         return users;
+    }
+
+    // NEW FUNCTIONALITY: Delete User by ID
+    public boolean deleteUser(long userId) {
+        Connection conn = DatabaseManager.getConnection();
+        if (conn == null) return false;
+
+        // NOTE: Must delete dependent records (reviews) first due to FOREIGN KEY constraint
+        try (PreparedStatement deleteReviews = conn.prepareStatement("DELETE FROM reviews WHERE user_id = ?");
+             PreparedStatement deleteUser = conn.prepareStatement("DELETE FROM users WHERE user_id = ?")) {
+
+            deleteReviews.setLong(1, userId);
+            deleteReviews.executeUpdate();
+
+            deleteUser.setLong(1, userId);
+            return deleteUser.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("❌ SQL error while deleting user:");
+            e.printStackTrace();
+            return false;
+        }
     }
 }

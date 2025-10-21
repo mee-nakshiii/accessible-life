@@ -5,164 +5,202 @@ import com.accessiblelife.service.UserService;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 public class RegisterPage extends JFrame {
+
     private final UserService userService = new UserService();
 
-    // --- THEME COLORS ---
-    private static final Color BG_COLOR = new Color(240, 255, 240); // Honeydew
-    private static final Color ACCENT_COLOR = new Color(144, 238, 144); // Light Green
-    private static final Color TEXT_COLOR = new Color(47, 79, 79); // Dark Slate Gray
-    private static final Color FIELD_BORDER = new Color(180, 180, 180);
-
     public RegisterPage() {
-        setTitle("Register");
-        setUndecorated(true);
+        setTitle("Register New Account");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(550, 750);
 
-        // Full screen setup
-        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        if (gd.isFullScreenSupported()) {
-            gd.setFullScreenWindow(this);
-        } else {
-            setExtendedState(JFrame.MAXIMIZED_BOTH);
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            System.err.println("Could not set system look and feel.");
         }
 
-        getContentPane().setBackground(BG_COLOR);
+        getContentPane().setBackground(ThemeColors.BG_PRIMARY);
         setLayout(new GridBagLayout());
 
-        // Form panel (White card)
-        JPanel formPanel = new JPanel();
-        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
-        formPanel.setBackground(Color.WHITE);
-        formPanel.setBorder(BorderFactory.createEmptyBorder(50, 100, 50, 100));
-        formPanel.setPreferredSize(new Dimension(600, 650));
+        // --- Form Card Panel ---
+        JPanel formPanel = createRegisterCard();
 
-        JLabel title = new JLabel("Create Your Accessible Account", SwingConstants.CENTER);
+        add(formPanel, new GridBagConstraints());
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    private JPanel createRegisterCard() {
+        JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBackground(ThemeColors.CARD_BG);
+        card.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(ThemeColors.BORDER_GRAY, 1),
+                BorderFactory.createEmptyBorder(50, 60, 50, 60)
+        ));
+
+        // Header
+        JLabel title = new JLabel("Create Your Account", SwingConstants.CENTER);
         title.setFont(new Font("Segoe UI", Font.BOLD, 36));
-        title.setForeground(ACCENT_COLOR);
+        title.setForeground(ThemeColors.ACCENT_PRIMARY);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
-        title.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
+        title.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
 
-        JLabel subtitle = new JLabel("Sign up for full access to features.", SwingConstants.CENTER);
+        JLabel subtitle = new JLabel("Join our accessible community.", SwingConstants.CENTER);
         subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 18));
-        subtitle.setForeground(TEXT_COLOR);
+        subtitle.setForeground(ThemeColors.TEXT_PRIMARY);
         subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         subtitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
 
 
-        JTextField nameField = createStyledTextField();
-        JTextField emailField = createStyledTextField();
-        JPasswordField passwordField = createStyledPasswordField();
+        // Fields
+        JTextField nameField = createStyledTextField("Full Name");
+        JTextField emailField = createStyledTextField("Email Address");
+        JPasswordField passwordField = createStyledPasswordField("Password");
+
+        // Buttons
+        JButton registerBtn = ThemeButton.createPrimary("Register", ThemeColors.ACCENT_PRIMARY);
+        registerBtn.setMaximumSize(new Dimension(350, 55));
+        registerBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JButton backToLoginBtn = createStyledButton("← Back to Login", ThemeColors.BORDER_GRAY, ThemeColors.TEXT_PRIMARY);
+        backToLoginBtn.setMaximumSize(new Dimension(350, 40));
+        backToLoginBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 
-        JLabel nameLabel = createStyledLabel("Name:");
-        JLabel emailLabel = createStyledLabel("Email:");
-        JLabel passwordLabel = createStyledLabel("Password:");
-
-        formPanel.add(title);
-        formPanel.add(subtitle);
-
-        // --- Name Field ---
-        formPanel.add(nameLabel);
-        formPanel.add(Box.createVerticalStrut(5));
-        formPanel.add(nameField);
-        formPanel.add(Box.createVerticalStrut(15));
-
-        // --- Email Field ---
-        formPanel.add(emailLabel);
-        formPanel.add(Box.createVerticalStrut(5));
-        formPanel.add(emailField);
-        formPanel.add(Box.createVerticalStrut(15));
-
-        // --- Password Field ---
-        formPanel.add(passwordLabel);
-        formPanel.add(Box.createVerticalStrut(5));
-        formPanel.add(passwordField);
-        formPanel.add(Box.createVerticalStrut(30));
-
-
-        JButton registerBtn = createStyledButton("Register", ACCENT_COLOR, Color.WHITE);
-        registerBtn.setMaximumSize(new Dimension(250, 50));
-        registerBtn.addActionListener(e -> {
-            String name = nameField.getText().trim();
-            String email = emailField.getText().trim();
-            String password = new String(passwordField.getPassword()).trim();
-
-            if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "All fields are required.", "Input Error", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            User newUser = new User(name, email, password, false);
-            boolean success = userService.registerUser(newUser);
-
-            if (success) {
-                JOptionPane.showMessageDialog(this, "Registration successful! You can now log in.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                dispose();
-                new LoginPage(); // Return to Login Page
-            } else {
-                JOptionPane.showMessageDialog(this, "Registration failed. Email might already be in use.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        JButton backToLogin = createStyledButton("← Back to Login", new Color(180, 180, 180), TEXT_COLOR);
-        backToLogin.setMaximumSize(new Dimension(200, 40));
-        backToLogin.addActionListener(e -> {
+        registerBtn.addActionListener(e -> attemptRegister(nameField, emailField, passwordField));
+        backToLoginBtn.addActionListener(e -> {
             dispose();
-            new LoginPage();
+            new LoginPage().setVisible(true);
         });
 
+        // Layout
+        card.add(title);
+        card.add(subtitle);
+        card.add(createLabel("Name:"));
+        card.add(nameField);
+        card.add(Box.createVerticalStrut(15));
+        card.add(createLabel("Email:"));
+        card.add(emailField);
+        card.add(Box.createVerticalStrut(15));
+        card.add(createLabel("Password:"));
+        card.add(passwordField);
+        card.add(Box.createVerticalStrut(40));
+        card.add(registerBtn);
+        card.add(Box.createVerticalStrut(10));
+        card.add(backToLoginBtn);
 
-        formPanel.add(registerBtn);
-        formPanel.add(Box.createVerticalStrut(10));
-        formPanel.add(backToLogin);
-
-        add(formPanel, new GridBagConstraints());
-
-        // ESC key to exit full screen
-        getRootPane().registerKeyboardAction(e -> dispose(),
-                KeyStroke.getKeyStroke("ESCAPE"),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-
-        setVisible(true);
+        return card;
     }
 
-    // --- Helper methods for styling ---
-    private JLabel createStyledLabel(String text) {
+    private void attemptRegister(JTextField nameField, JTextField emailField, JPasswordField passwordField) {
+        String name = nameField.getText().trim();
+        String email = emailField.getText().trim();
+        String password = new String(passwordField.getPassword()).trim();
+
+        if (name.isEmpty() || email.isEmpty() || password.isEmpty() ||
+                name.equals("Full Name") || email.equals("Email Address") || password.equals("Password")) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // NOTE: Password hashing should be implemented here in a production environment
+        User newUser = new User(name, email, password, false);
+        boolean success = userService.registerUser(newUser);
+
+        if (success) {
+            JOptionPane.showMessageDialog(this, "Registration successful! Please log in.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
+            new LoginPage().setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Registration failed. Email might already be in use.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // --- Helper Methods (Create as private methods in your class) ---
+    private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
-        label.setFont(new Font("Segoe UI", Font.PLAIN, 18));
-        label.setForeground(TEXT_COLOR);
+        label.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        label.setForeground(ThemeColors.TEXT_PRIMARY);
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
         return label;
     }
 
-    private JTextField createStyledTextField() {
-        JTextField field = new JTextField();
-        field.setMaximumSize(new Dimension(400, 40));
+    private JTextField createStyledTextField(String placeholder) {
+        JTextField field = new JTextField(placeholder);
         field.setFont(new Font("Segoe UI", Font.PLAIN, 18));
-        field.setBorder(BorderFactory.createLineBorder(FIELD_BORDER));
+        field.setForeground(ThemeColors.TEXT_PRIMARY);
+        field.setBackground(ThemeColors.CARD_BG);
+        field.setMaximumSize(new Dimension(350, 45));
+        field.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(ThemeColors.BORDER_GRAY),
+                BorderFactory.createEmptyBorder(8, 10, 8, 10)
+        ));
+        field.addFocusListener(new PlaceholderFocusListener(field, placeholder, false));
         return field;
     }
 
-    private JPasswordField createStyledPasswordField() {
-        JPasswordField field = new JPasswordField();
-        field.setMaximumSize(new Dimension(400, 40));
+    private JPasswordField createStyledPasswordField(String placeholder) {
+        JPasswordField field = new JPasswordField(placeholder);
         field.setFont(new Font("Segoe UI", Font.PLAIN, 18));
-        field.setBorder(BorderFactory.createLineBorder(FIELD_BORDER));
+        field.setForeground(ThemeColors.TEXT_PRIMARY);
+        field.setBackground(ThemeColors.CARD_BG);
+        field.setMaximumSize(new Dimension(350, 45));
+        field.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(ThemeColors.BORDER_GRAY),
+                BorderFactory.createEmptyBorder(8, 10, 8, 10)
+        ));
+        field.setEchoChar((char) 0);
+        field.addFocusListener(new PlaceholderFocusListener(field, placeholder, true));
         return field;
     }
 
     private JButton createStyledButton(String text, Color bg, Color fg) {
-        JButton button = new JButton(text);
-        button.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        button.setBackground(bg);
+        JButton button = ThemeButton.createPrimary(text, bg);
         button.setForeground(fg);
-        button.setFocusPainted(false);
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(60, 179, 113), 2),
-                BorderFactory.createEmptyBorder(10, 25, 10, 25)
-        ));
-        button.setAlignmentX(Component.CENTER_ALIGNMENT);
         return button;
+    }
+
+    // Helper class for placeholder logic (put this inside RegisterPage.java)
+    private static class PlaceholderFocusListener extends FocusAdapter {
+        private final JTextField field;
+        private final String placeholder;
+        private final boolean isPassword;
+
+        public PlaceholderFocusListener(JTextField field, String placeholder, boolean isPassword) {
+            this.field = field;
+            this.placeholder = placeholder;
+            this.isPassword = isPassword;
+        }
+
+        @Override
+        public void focusGained(FocusEvent e) {
+            if (isPassword) {
+                JPasswordField passField = (JPasswordField) field;
+                if (new String(passField.getPassword()).equals(placeholder)) {
+                    passField.setText("");
+                    passField.setEchoChar('\u2022');
+                }
+            } else if (field.getText().equals(placeholder)) {
+                field.setText("");
+            }
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+            if (field.getText().isEmpty()) {
+                if (isPassword) {
+                    JPasswordField passField = (JPasswordField) field;
+                    passField.setText(placeholder);
+                    passField.setEchoChar((char) 0);
+                } else {
+                    field.setText(placeholder);
+                }
+            }
+        }
     }
 }

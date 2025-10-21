@@ -10,30 +10,21 @@ import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.List;
 
-public class ManagePlacesForm extends JFrame {
+public class UserPlacesForm extends JFrame {
 
     private static final Color BG_COLOR = ThemeColors.BG_PRIMARY;
     private static final Color TEXT_COLOR = ThemeColors.TEXT_PRIMARY;
     private static final Color ACCENT_COLOR = ThemeColors.ACCENT_PRIMARY;
     private static final Color LOGOUT_COLOR = ThemeColors.LOGOUT_RED;
 
-
     private final PlaceService placeService = new PlaceService();
-    private final JTable placeTable;
+    private final JTable userPlaceTable;
     private final DefaultTableModel model;
+    private final long currentUserId; // To filter places by the logged-in user
 
-    private final long currentUserId; // Stores the Admin's ID
-
-    // FIX: Explicitly define the no-argument constructor required by AdminDashboard
-    public ManagePlacesForm() {
-        this(0); // Calls the main constructor with a placeholder ID (0 or Admin ID)
-    }
-
-    // Main constructor
-    public ManagePlacesForm(long userId) {
-        this.currentUserId = userId; // Admin ID is passed here
-
-        setTitle("Admin: Manage Places");
+    public UserPlacesForm(long userId) {
+        this.currentUserId = userId;
+        setTitle("My Submitted Places");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 
@@ -41,7 +32,7 @@ public class ManagePlacesForm extends JFrame {
         setLayout(new BorderLayout());
 
         // Header
-        JLabel header = new JLabel("Registered Accessible Places", SwingConstants.CENTER);
+        JLabel header = new JLabel("My Submitted Places", SwingConstants.CENTER);
         header.setFont(new Font("Segoe UI", Font.BOLD, 36));
         header.setForeground(TEXT_COLOR);
         header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
@@ -50,15 +41,15 @@ public class ManagePlacesForm extends JFrame {
         // --- Place Data Table ---
         String[] columnNames = {"ID", "Name", "Category", "Ramp", "Toilet", "Braille", "Elevator"};
         model = new DefaultTableModel(columnNames, 0);
-        placeTable = new JTable(model);
+        userPlaceTable = new JTable(model);
 
-        placeTable.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        placeTable.setRowHeight(30);
-        placeTable.setGridColor(ThemeColors.BORDER_GRAY);
-        placeTable.setBackground(ThemeColors.CARD_BG);
-        placeTable.setForeground(TEXT_COLOR);
+        userPlaceTable.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        userPlaceTable.setRowHeight(30);
+        userPlaceTable.setGridColor(ThemeColors.BORDER_GRAY);
+        userPlaceTable.setBackground(ThemeColors.CARD_BG);
+        userPlaceTable.setForeground(TEXT_COLOR);
 
-        JTableHeader tableHeader = placeTable.getTableHeader();
+        JTableHeader tableHeader = userPlaceTable.getTableHeader();
         tableHeader.setFont(new Font("Segoe UI", Font.BOLD, 18));
         tableHeader.setBackground(ThemeColors.ACCENT_SECONDARY);
         tableHeader.setForeground(TEXT_COLOR);
@@ -67,13 +58,13 @@ public class ManagePlacesForm extends JFrame {
 
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        for (int i = 3; i < placeTable.getColumnCount(); i++) {
-            placeTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        for (int i = 3; i < userPlaceTable.getColumnCount(); i++) {
+            userPlaceTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
 
-        loadPlaceData();
+        loadUserPlaceData();
 
-        JScrollPane scrollPane = new JScrollPane(placeTable);
+        JScrollPane scrollPane = new JScrollPane(userPlaceTable);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
         scrollPane.setBackground(BG_COLOR);
         add(scrollPane, BorderLayout.CENTER);
@@ -82,15 +73,17 @@ public class ManagePlacesForm extends JFrame {
         JPanel footer = new JPanel();
         footer.setBackground(BG_COLOR);
 
-        JButton closeBtn = createStyledButton("← Back to Dashboard", ThemeColors.BORDER_GRAY, TEXT_COLOR);
+        JButton closeBtn = createStyledButton("← Back to Home", ThemeColors.BORDER_GRAY, TEXT_COLOR);
         closeBtn.addActionListener(e -> dispose());
 
-        // FIX: Pass the user ID to the AddPlaceForm constructor
         JButton addBtn = createStyledButton("Add New Place", ACCENT_COLOR, Color.WHITE);
         addBtn.addActionListener(e -> {
-            new AddPlaceForm(currentUserId).setVisible(true); // Pass the Admin ID
-            // NOTE: Add a listener here to refresh the table after AddPlaceForm closes
+            new AddPlaceForm(currentUserId).setVisible(true); // Pass user ID to AddPlaceForm
+            // Implement a way to refresh table after AddPlaceForm closes (e.g., using a WindowListener)
         });
+
+        JButton editBtn = createStyledButton("Edit Selected Place", ThemeColors.ACCENT_SECONDARY.darker(), Color.WHITE);
+        editBtn.addActionListener(e -> editSelectedPlace());
 
         JButton deleteBtn = createStyledButton("Delete Selected Place", LOGOUT_COLOR, Color.WHITE);
         deleteBtn.addActionListener(e -> deleteSelectedPlace());
@@ -99,17 +92,18 @@ public class ManagePlacesForm extends JFrame {
         footer.add(Box.createHorizontalStrut(20));
         footer.add(addBtn);
         footer.add(Box.createHorizontalStrut(20));
+        footer.add(editBtn);
+        footer.add(Box.createHorizontalStrut(20));
         footer.add(deleteBtn);
         add(footer, BorderLayout.SOUTH);
 
         setVisible(true);
     }
 
-    // ... (rest of methods: loadPlaceData, deleteSelectedPlace, createStyledButton)
-
-    private void loadPlaceData() {
+    // NEW: Load places specific to this user
+    private void loadUserPlaceData() {
         model.setRowCount(0);
-        List<Place> places = placeService.getAllPlaces();
+        List<Place> places = placeService.getPlacesByUserId(currentUserId);
 
         for (Place place : places) {
             model.addRow(new Object[]{
@@ -124,8 +118,36 @@ public class ManagePlacesForm extends JFrame {
         }
     }
 
+    private void editSelectedPlace() {
+        int selectedRow = userPlaceTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a place to edit.", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        long placeId = (long) model.getValueAt(selectedRow, 0);
+        Place placeToEdit = placeService.getPlaceById(placeId);
+
+        if (placeToEdit != null) {
+            // Open an edit form. We can reuse/adapt AddPlaceForm for this.
+            AddPlaceForm editForm = new AddPlaceForm(currentUserId, placeToEdit);
+            editForm.setVisible(true);
+
+            // Add a WindowListener to refresh table when edit form closes
+            editForm.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent windowEvent) {
+                    loadUserPlaceData(); // Refresh table when edit form is closed
+                }
+            });
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Could not retrieve place details.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     private void deleteSelectedPlace() {
-        int selectedRow = placeTable.getSelectedRow();
+        int selectedRow = userPlaceTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Please select a place to delete.", "Warning", JOptionPane.WARNING_MESSAGE);
             return;
@@ -141,7 +163,7 @@ public class ManagePlacesForm extends JFrame {
         if (confirm == JOptionPane.YES_OPTION) {
             if (placeService.deletePlace(placeId)) {
                 JOptionPane.showMessageDialog(this, "Place deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadPlaceData(); // Refresh table
+                loadUserPlaceData(); // Refresh table
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to delete place.", "DB Error", JOptionPane.ERROR_MESSAGE);
             }

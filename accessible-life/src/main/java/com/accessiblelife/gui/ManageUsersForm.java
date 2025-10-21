@@ -4,21 +4,22 @@ import com.accessiblelife.model.User;
 import com.accessiblelife.service.UserService;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.List;
 
 public class ManageUsersForm extends JFrame {
 
-    // --- THEME COLORS ---
-    private static final Color BG_COLOR = new Color(240, 255, 240);
-    // FIX: ACCENT_COLOR field is kept for consistency if it's used elsewhere,
-    // but if only used in button creation (now in UIHelper), it should be deleted.
-    // Assuming it's deleted here since the button styling uses the static UIHelper methods.
-    private static final Color TEXT_COLOR = new Color(47, 79, 79);
-    private static final Color LOGOUT_COLOR = new Color(255, 100, 100);
+    private static final Color BG_COLOR = ThemeColors.BG_PRIMARY;
+    private static final Color TEXT_COLOR = ThemeColors.TEXT_PRIMARY;
+    private static final Color LOGOUT_COLOR = ThemeColors.LOGOUT_RED;
+    private static final Color ACCENT_COLOR = ThemeColors.ACCENT_PRIMARY;
 
-    private final UserService userService = new UserService(); // FIX: Added 'final'
+    private final UserService userService = new UserService();
+    private final JTable userTable;
+    private final DefaultTableModel model;
 
     public ManageUsersForm() {
         setTitle("Admin: Manage Users");
@@ -35,31 +36,55 @@ public class ManageUsersForm extends JFrame {
         header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         add(header, BorderLayout.NORTH);
 
-        // User Data Table
+        // --- User Data Table ---
         String[] columnNames = {"ID", "Name", "Email", "Role"};
-        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
-        JTable userTable = new JTable(model);
-        userTable.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        userTable.setRowHeight(25);
-        userTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 16));
+        model = new DefaultTableModel(columnNames, 0);
+        userTable = new JTable(model);
 
-        loadUserData(model);
+        // FIX: Apply modern font and styling to table
+        userTable.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        userTable.setRowHeight(30); // Increased row height for better user experience
+        userTable.setGridColor(ThemeColors.BORDER_GRAY);
+        userTable.setBackground(ThemeColors.CARD_BG);
+        userTable.setForeground(TEXT_COLOR);
+
+        // FIX: Style the table header
+        JTableHeader tableHeader = userTable.getTableHeader();
+        tableHeader.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        tableHeader.setBackground(ThemeColors.ACCENT_SECONDARY); // Light mint background for header
+        tableHeader.setForeground(TEXT_COLOR);
+        tableHeader.setReorderingAllowed(false);
+        tableHeader.setResizingAllowed(false);
+
+        // Center-align text in cells
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        for (int i = 0; i < userTable.getColumnCount(); i++) {
+            userTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+
+        loadUserData();
 
         JScrollPane scrollPane = new JScrollPane(userTable);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+        scrollPane.setBackground(BG_COLOR);
         add(scrollPane, BorderLayout.CENTER);
 
         // Footer/Action Panel
         JPanel footer = new JPanel();
         footer.setBackground(BG_COLOR);
 
-        JButton closeBtn = createSmallStyledButton("← Back to Dashboard", new Color(180, 180, 180), TEXT_COLOR);
-        closeBtn.addActionListener(e -> dispose()); // FIX: Simplified lambda
+        // Buttons use ThemeButton
+        JButton closeBtn = ThemeButton.createPrimary("← Back to Dashboard", ThemeColors.BORDER_GRAY);
+        closeBtn.setForeground(TEXT_COLOR);
+        closeBtn.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        closeBtn.setMaximumSize(new Dimension(250, 50));
+        closeBtn.addActionListener(e -> dispose());
 
-        JButton deleteBtn = createSmallStyledButton("Delete Selected User", LOGOUT_COLOR, Color.WHITE);
-        deleteBtn.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Delete functionality coming soon!");
-        });
+        JButton deleteBtn = ThemeButton.createPrimary("Delete Selected User", LOGOUT_COLOR);
+        deleteBtn.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        deleteBtn.setMaximumSize(new Dimension(250, 50));
+        deleteBtn.addActionListener(e -> deleteSelectedUser());
 
         footer.add(closeBtn);
         footer.add(Box.createHorizontalStrut(20));
@@ -69,7 +94,8 @@ public class ManageUsersForm extends JFrame {
         setVisible(true);
     }
 
-    private void loadUserData(DefaultTableModel model) {
+    private void loadUserData() {
+        model.setRowCount(0);
         List<User> users = userService.getAllUsers();
         for (User user : users) {
             String role = user.isAdmin() ? "Admin" : "Standard";
@@ -77,16 +103,27 @@ public class ManageUsersForm extends JFrame {
         }
     }
 
-    // NOTE: This helper method prevents the "Local variable 'button' is redundant" warning
-    // when using the simplified UIHelper calls.
-    private JButton createSmallStyledButton(String text, Color bg, Color fg) {
-        JButton button = new JButton(text);
-        button.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        button.setBackground(bg);
-        button.setForeground(fg);
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-        button.setMaximumSize(new Dimension(250, 50));
-        return button;
+    private void deleteSelectedUser() {
+        int selectedRow = userTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a user to delete.", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        long userId = (long) model.getValueAt(selectedRow, 0);
+        String userName = (String) model.getValueAt(selectedRow, 1);
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to permanently delete user: " + userName + "?",
+                "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            if (userService.deleteUser(userId)) {
+                JOptionPane.showMessageDialog(this, "User deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadUserData();
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to delete user. Please ensure all associated records are handled.", "DB Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 }

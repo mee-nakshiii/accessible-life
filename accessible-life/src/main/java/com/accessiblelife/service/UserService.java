@@ -16,8 +16,16 @@ public class UserService {
         return userRepo.saveUser(user);
     }
 
-    // NEW METHOD: Fetch all users for Admin
     public List<User> getAllUsers() {
         return userRepo.findAllUsers();
+    }
+
+    // FIX: New method to bridge the GUI (ManageUsersForm) and the Repository
+    public boolean deleteUser(long userId) {
+        if (userId <= 0) {
+            System.err.println("Invalid User ID for deletion.");
+            return false;
+        }
+        return userRepo.deleteUser(userId);
     }
 }

@@ -65,12 +65,12 @@ public class AdminDashboard extends JFrame {
 
         manageUsersBtn.addActionListener(e -> new ManageUsersForm().setVisible(true));
 
-        managePlacesBtn.addActionListener(e -> new AddPlaceForm().setVisible(true));
+        // FIX: Ensure this calls ManagePlacesForm (the table view) with no arguments
+        managePlacesBtn.addActionListener(e -> new ManagePlacesForm().setVisible(true));
 
         logoutBtn.addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Admin logged out successfully!", "Logout", JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
-            // CORRECT FIX: Chaining .setVisible(true) properly
             new LoginPage().setVisible(true);
         });
 

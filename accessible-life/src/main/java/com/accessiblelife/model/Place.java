@@ -12,7 +12,7 @@ public class Place {
     private boolean hasBrailleSignage;
     private boolean hasElevator;
 
-    // Full 9-argument constructor (used when fetching from DB)
+    // 1. Full 9-argument constructor (used when fetching from DB)
     public Place(long id, String name, String description, String location, String category,
                  boolean hasRamp, boolean hasAccessibleToilet, boolean hasBrailleSignage, boolean hasElevator) {
         this.id = id;
@@ -26,14 +26,14 @@ public class Place {
         this.hasElevator = hasElevator;
     }
 
-    // FIX: 8-argument constructor for NEW places (ID is 0 for DB auto-generation)
+    // 2. CRITICAL FIX: 8-argument constructor for NEW places (ID is 0 for DB auto-generation)
+    // This resolves the "Cannot resolve constructor" error.
     public Place(String name, String description, String location, String category,
                  boolean hasRamp, boolean hasAccessibleToilet, boolean hasBrailleSignage, boolean hasElevator) {
         this(0, name, description, location, category, hasRamp, hasAccessibleToilet, hasBrailleSignage, hasElevator);
     }
 
-    // Minimal constructor for places without full features (e.g., initial creation)
-    // NOTE: This will likely be unused now, but is kept for robustness.
+    // Minimal constructor
     public Place(String name, String description, String location, String category) {
         this(0, name, description, location, category, false, false, false, false);
     }

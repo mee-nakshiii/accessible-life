@@ -12,17 +12,37 @@ public class PlaceService {
         return placeRepository.getAllPlaces();
     }
 
+    // FIX: Add the missing method signature that SearchByFeature.java requires
     public List<Place> searchPlacesByFeatures(boolean ramp, boolean toilet, boolean braille, boolean elevator) {
         return placeRepository.searchPlacesByFeatures(ramp, toilet, braille, elevator);
     }
 
-    // NEW METHOD: Save a new place (called from the GUI)
+    public Place getPlaceById(long placeId) {
+        return placeRepository.getPlaceById(placeId);
+    }
+
+    public List<Place> getPlacesByUserId(long userId) {
+        return placeRepository.getPlacesByUserId(userId);
+    }
+
     public boolean savePlace(Place place) {
-        // Basic validation before saving
         if (place.getName().trim().isEmpty() || place.getLocation().trim().isEmpty()) {
             System.err.println("Place name and location cannot be empty.");
             return false;
         }
         return placeRepository.savePlace(place);
+    }
+
+    public boolean updatePlace(Place place) {
+        // This relies on the placeholder method in the repository.
+        return placeRepository.updatePlace(place);
+    }
+
+    public boolean deletePlace(long placeId) {
+        if (placeId <= 0) {
+            System.err.println("Invalid Place ID for deletion.");
+            return false;
+        }
+        return placeRepository.deletePlace(placeId);
     }
 }
