@@ -1,5 +1,8 @@
 package com.accessiblelife.gui;
 
+import com.accessiblelife.model.Place; // FIX: Added import for Place
+import com.accessiblelife.service.PlaceService; // FIX: Added import for PlaceService
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -7,20 +10,25 @@ public class HomePanel extends JPanel {
 
     private final MainWindow parent;
 
+    // Instantiate the service for use in report logic
+    private final PlaceService placeService = new PlaceService(); // FIX: Added service instance
+
     // --- THEME COLORS ---
     private static final Color BG_COLOR = ThemeColors.BG_PRIMARY;
     private static final Color ACCENT_COLOR = ThemeColors.ACCENT_PRIMARY;
     private static final Color TEXT_COLOR = ThemeColors.TEXT_PRIMARY;
     private static final Color BORDER_GRAY = ThemeColors.BORDER_GRAY;
 
+    // FIX: Parameter 'userName' is now used in the Welcome JLabel construction
     public HomePanel(MainWindow parent, String userName) {
         this.parent = parent;
 
         setBackground(BG_COLOR);
         setLayout(new BorderLayout());
 
-        // --- 1. Main Welcome/Title (from MainWindow Header) ---
-        JLabel title = new JLabel("Application Dashboard", SwingConstants.CENTER);
+        // --- 1. Main Welcome/Title ---
+        // FIX: Using userName parameter in the greeting
+        JLabel title = new JLabel("Welcome, " + userName + "!", SwingConstants.CENTER);
         title.setFont(new Font("Segoe UI", Font.BOLD, 36));
         title.setForeground(TEXT_COLOR);
         title.setBorder(BorderFactory.createEmptyBorder(30, 0, 10, 0));
@@ -31,11 +39,11 @@ public class HomePanel extends JPanel {
 
         JPanel featureCard = new JPanel();
         featureCard.setLayout(new BoxLayout(featureCard, BoxLayout.Y_AXIS));
-        featureCard.setBackground(ThemeColors.CARD_BG); // White Card
+        featureCard.setBackground(ThemeColors.CARD_BG);
 
         featureCard.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(BORDER_GRAY, 1),
-                BorderFactory.createEmptyBorder(40, 40, 40, 40) // Reduced padding
+                BorderFactory.createEmptyBorder(40, 40, 40, 40)
         ));
 
         // --- Components for the Card ---
@@ -45,27 +53,23 @@ public class HomePanel extends JPanel {
         instruction.setAlignmentX(Component.CENTER_ALIGNMENT);
         instruction.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
 
-        // Search field (for quick search visual)
-        JTextField searchField = createStyledTextField("Find accessible places...");
-        searchField.setMaximumSize(new Dimension(350, 40));
-
-        // --- PRIMARY BUTTONS ---
+        // Buttons
         JButton searchBtn = createStyledButton("🔍 Search Accessible Places", ACCENT_COLOR);
         JButton reviewBtn = createStyledButton("✍️ Submit a Review", ACCENT_COLOR);
-
-        // --- NEW BUTTONS FOR MISSING FUNCTIONALITY ---
         JButton myPlacesBtn = createStyledButton("📍 My Submitted Places", ACCENT_COLOR);
+        JButton reportBtn = createStyledButton("⚠ Report Inaccurate Info", ThemeColors.LOGOUT_RED);
         JButton feedbackBtn = createStyledButton("💬 Give Feedback", ACCENT_COLOR);
 
-        // --- Layout ---
+        // Layout
         featureCard.add(instruction);
-        featureCard.add(searchField);
         featureCard.add(Box.createVerticalStrut(20));
         featureCard.add(searchBtn);
         featureCard.add(Box.createVerticalStrut(10));
         featureCard.add(reviewBtn);
-        featureCard.add(Box.createVerticalStrut(25)); // Separator for management tools
+        featureCard.add(Box.createVerticalStrut(10));
         featureCard.add(myPlacesBtn);
+        featureCard.add(Box.createVerticalStrut(25));
+        featureCard.add(reportBtn);
         featureCard.add(Box.createVerticalStrut(10));
         featureCard.add(feedbackBtn);
 
@@ -78,27 +82,41 @@ public class HomePanel extends JPanel {
         add(northPanel, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
 
-        // --- ACTION LISTENERS (NEW) ---
+        // --- ACTION LISTENERS ---
         searchBtn.addActionListener(e -> new SearchByFeature().setVisible(true));
         reviewBtn.addActionListener(e -> parent.showPanel("review"));
 
-        // NEW LISTENERS
         myPlacesBtn.addActionListener(e -> new UserPlacesForm(parent.getCurrentUser().getId()).setVisible(true));
         feedbackBtn.addActionListener(e -> new FeedbackForm().setVisible(true));
-        // NOTE: Reporting (inaccurate info) is best placed on the Search/Review screens, not the Home screen.
+
+        reportBtn.addActionListener(e -> reportPlaceFromDashboard()); // Calls the new method
     }
 
-    private JTextField createStyledTextField(String placeholder) {
-        JTextField field = new JTextField(placeholder);
-        field.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        field.setForeground(ThemeColors.TEXT_PRIMARY);
-        field.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ThemeColors.BORDER_GRAY),
-                BorderFactory.createEmptyBorder(8, 10, 8, 10)
-        ));
-        field.setAlignmentX(Component.CENTER_ALIGNMENT);
-        return field;
+    private void reportPlaceFromDashboard() {
+        String input = JOptionPane.showInputDialog(this,
+                "Enter the ID of the place you want to report:",
+                "Report Place", JOptionPane.QUESTION_MESSAGE);
+
+        if (input != null && !input.trim().isEmpty()) {
+            try {
+                long placeId = Long.parseLong(input.trim());
+
+                // Retrieve the Place object using the service layer
+                Place placeToReport = placeService.getPlaceById(placeId); // FIX: PlaceService now resolved
+
+                if (placeToReport != null) {
+                    // Calls the ReportForm(long userId, Place place) constructor
+                    new ReportForm(parent.getCurrentUser().getId(), placeToReport).setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Place ID not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
+
 
     private JButton createStyledButton(String text, Color bg) {
         JButton button = ThemeButton.createPrimary(text, bg);

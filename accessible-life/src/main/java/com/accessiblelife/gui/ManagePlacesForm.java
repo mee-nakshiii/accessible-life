@@ -22,16 +22,14 @@ public class ManagePlacesForm extends JFrame {
     private final JTable placeTable;
     private final DefaultTableModel model;
 
-    private final long currentUserId; // Stores the Admin's ID
+    private final long currentUserId;
 
-    // FIX: Explicitly define the no-argument constructor required by AdminDashboard
     public ManagePlacesForm() {
-        this(0); // Calls the main constructor with a placeholder ID (0 or Admin ID)
+        this(0);
     }
 
-    // Main constructor
     public ManagePlacesForm(long userId) {
-        this.currentUserId = userId; // Admin ID is passed here
+        this.currentUserId = userId;
 
         setTitle("Admin: Manage Places");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -85,12 +83,12 @@ public class ManagePlacesForm extends JFrame {
         JButton closeBtn = createStyledButton("← Back to Dashboard", ThemeColors.BORDER_GRAY, TEXT_COLOR);
         closeBtn.addActionListener(e -> dispose());
 
-        // FIX: Pass the user ID to the AddPlaceForm constructor
         JButton addBtn = createStyledButton("Add New Place", ACCENT_COLOR, Color.WHITE);
-        addBtn.addActionListener(e -> {
-            new AddPlaceForm(currentUserId).setVisible(true); // Pass the Admin ID
-            // NOTE: Add a listener here to refresh the table after AddPlaceForm closes
-        });
+        addBtn.addActionListener(e -> addPlace()); // Calls helper method
+
+        // NEW: Edit Button
+        JButton editBtn = createStyledButton("Edit Details/Verify", ACCENT_COLOR.darker(), Color.WHITE);
+        editBtn.addActionListener(e -> editPlace()); // Calls helper method
 
         JButton deleteBtn = createStyledButton("Delete Selected Place", LOGOUT_COLOR, Color.WHITE);
         deleteBtn.addActionListener(e -> deleteSelectedPlace());
@@ -99,14 +97,51 @@ public class ManagePlacesForm extends JFrame {
         footer.add(Box.createHorizontalStrut(20));
         footer.add(addBtn);
         footer.add(Box.createHorizontalStrut(20));
+        footer.add(editBtn); // Added Edit Button
+        footer.add(Box.createHorizontalStrut(20));
         footer.add(deleteBtn);
         add(footer, BorderLayout.SOUTH);
 
         setVisible(true);
     }
 
-    // ... (rest of methods: loadPlaceData, deleteSelectedPlace, createStyledButton)
+    // Helper method to open AddPlaceForm and ensure refresh upon close
+    private void addPlace() {
+        AddPlaceForm addForm = new AddPlaceForm(currentUserId);
+        addForm.setVisible(true);
+        addForm.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent windowEvent) {
+                loadPlaceData(); // Refresh table after form closes
+            }
+        });
+    }
 
+    // NEW Helper method to handle editing
+    private void editPlace() {
+        int selectedRow = placeTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a place to edit.", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        long placeId = (long) model.getValueAt(selectedRow, 0);
+        Place placeToEdit = placeService.getPlaceById(placeId);
+
+        if (placeToEdit != null) {
+            AddPlaceForm editForm = new AddPlaceForm(currentUserId, placeToEdit);
+            editForm.setVisible(true);
+            editForm.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent windowEvent) {
+                    loadPlaceData(); // Refresh table after edit form closes
+                }
+            });
+        } else {
+            JOptionPane.showMessageDialog(this, "Could not retrieve place details.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    // ... (loadPlaceData and deleteSelectedPlace methods remain) ...
     private void loadPlaceData() {
         model.setRowCount(0);
         List<Place> places = placeService.getAllPlaces();

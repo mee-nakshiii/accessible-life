@@ -2,6 +2,9 @@ package com.accessiblelife.service;
 
 import com.accessiblelife.repository.ReportRepository;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class ReportService {
     private final ReportRepository reportRepository = new ReportRepository();
 
@@ -11,5 +14,13 @@ public class ReportService {
             return false;
         }
         return reportRepository.submitReport(placeId, userId, reason);
+    }
+
+    public ResultSet getAllPendingReports() throws SQLException {
+        return reportRepository.getAllPendingReports();
+    }
+
+    public boolean updateStatus(long reportId, String newStatus) {
+        return reportRepository.updateStatus(reportId, newStatus);
     }
 }

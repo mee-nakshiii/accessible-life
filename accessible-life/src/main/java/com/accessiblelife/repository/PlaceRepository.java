@@ -23,7 +23,6 @@ public class PlaceRepository {
         );
     }
 
-    // Helper to get connection and handle null checks
     private Connection getConnectionSafely() {
         Connection conn = DatabaseManager.getConnection();
         if (conn == null) {
@@ -176,7 +175,7 @@ public class PlaceRepository {
         try {
             conn.setAutoCommit(false);
 
-            // Delete dependent records (transactional cleanup)
+            // Delete associated records from linking tables (user_places, reviews, reports)
             try (PreparedStatement deleteUserPlaces = conn.prepareStatement("DELETE FROM user_places WHERE place_id = ?")) {
                 deleteUserPlaces.setLong(1, placeId);
                 deleteUserPlaces.executeUpdate();
@@ -190,7 +189,7 @@ public class PlaceRepository {
                 deleteReports.executeUpdate();
             }
 
-            // Delete the place itself
+            // 4. Delete the place itself
             try (PreparedStatement deletePlace = conn.prepareStatement("DELETE FROM places WHERE place_id = ?")) {
                 deletePlace.setLong(1, placeId);
                 int affectedRows = deletePlace.executeUpdate();
@@ -206,9 +205,6 @@ public class PlaceRepository {
                 System.err.println("Error rolling back transaction: " + ex.getMessage());
             }
             return false;
-        } finally {
-            // Connection closure should ideally be handled at a higher level,
-            // but we ensure auto-commit is reset.
         }
     }
 }

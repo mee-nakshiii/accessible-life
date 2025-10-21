@@ -35,6 +35,7 @@ public class AdminDashboard extends JFrame {
         ));
 
         // Welcome Header
+        // Note: Grammar fixed by adding comma.
         JLabel welcomeLabel = new JLabel("Welcome, Administrator, " + user.getName(), SwingConstants.CENTER);
         welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 36));
         welcomeLabel.setForeground(ThemeColors.ACCENT_PRIMARY);
@@ -48,6 +49,10 @@ public class AdminDashboard extends JFrame {
         JButton managePlacesBtn = ThemeButton.createPrimary("📍 Manage Places", ThemeColors.ACCENT_PRIMARY);
         managePlacesBtn.setMaximumSize(new Dimension(300, 55));
 
+        // NEW Button: Report Handling
+        JButton manageReportsBtn = ThemeButton.createPrimary("🧾 Handle Reports", ThemeColors.LOGOUT_RED.darker());
+        manageReportsBtn.setMaximumSize(new Dimension(300, 55));
+
         JButton logoutBtn = ThemeButton.createPrimary("🚪 Logout", ThemeColors.LOGOUT_RED);
         logoutBtn.setMaximumSize(new Dimension(300, 55));
 
@@ -56,6 +61,8 @@ public class AdminDashboard extends JFrame {
         adminCard.add(manageUsersBtn);
         adminCard.add(Box.createVerticalStrut(20));
         adminCard.add(managePlacesBtn);
+        adminCard.add(Box.createVerticalStrut(20));
+        adminCard.add(manageReportsBtn); // Added Reports Button
         adminCard.add(Box.createVerticalStrut(40));
         adminCard.add(logoutBtn);
 
@@ -65,8 +72,11 @@ public class AdminDashboard extends JFrame {
 
         manageUsersBtn.addActionListener(e -> new ManageUsersForm().setVisible(true));
 
-        // FIX: Ensure this calls ManagePlacesForm (the table view) with no arguments
+        // Note: Admin dashboard button opens the TABLE view, which then handles ADD/EDIT/DELETE.
         managePlacesBtn.addActionListener(e -> new ManagePlacesForm().setVisible(true));
+
+        // Listener for Reports
+        manageReportsBtn.addActionListener(e -> new ManageReportsForm().setVisible(true));
 
         logoutBtn.addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Admin logged out successfully!", "Logout", JOptionPane.INFORMATION_MESSAGE);

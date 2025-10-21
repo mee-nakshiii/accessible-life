@@ -5,12 +5,13 @@ import com.accessiblelife.model.Place;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener; // Ensure this is imported if used in helpers
 
 public class ReportForm extends JFrame {
 
     private final ReportService reportService = new ReportService();
     private final long currentUserId;
-    private final Place place; // Place being reported
+    private final Place place;
 
     private JTextArea reasonArea;
 
@@ -53,6 +54,9 @@ public class ReportForm extends JFrame {
         JButton submitBtn = createStyledButton("Submit Report", ThemeColors.LOGOUT_RED);
         submitBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // --- ACTION LISTENER ---
+        submitBtn.addActionListener(e -> submitReport());
+
         formPanel.add(reasonLabel);
         formPanel.add(Box.createVerticalStrut(5));
         formPanel.add(scrollPane);
@@ -72,16 +76,20 @@ public class ReportForm extends JFrame {
             return;
         }
 
+        // Final submission call
         boolean success = reportService.submitReport(place.getId(), currentUserId, reason);
 
         if (success) {
+            // FIX: Ensure success message and immediate window closure on success
             JOptionPane.showMessageDialog(this, "Report submitted successfully! Admins will review.", "Report Sent", JOptionPane.INFORMATION_MESSAGE);
-            dispose();
+            this.dispose(); // CRITICAL: Close the window on success
         } else {
-            JOptionPane.showMessageDialog(this, "Failed to submit report. Check logs.", "Error", JOptionPane.ERROR_MESSAGE);
+            // Failure feedback
+            JOptionPane.showMessageDialog(this, "Failed to submit report. Check database connection or logs for details.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    // Helper method (Assuming createStyledButton is defined elsewhere or locally)
     private JButton createStyledButton(String text, Color bg) {
         JButton button = ThemeButton.createPrimary(text, bg);
         button.setMaximumSize(new Dimension(200, 45));
