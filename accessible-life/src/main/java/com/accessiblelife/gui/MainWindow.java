@@ -14,6 +14,8 @@ public class MainWindow extends JFrame {
     public MainWindow(User user) {
         this.currentUser = user;
 
+        // ... (rest of constructor remains the same)
+
         setTitle("Accessible Life - User Dashboard");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -53,8 +55,9 @@ public class MainWindow extends JFrame {
     }
 
     private JPanel createHeaderPanel() {
+        // ... (existing createHeaderPanel method)
         JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(ThemeColors.ACCENT_SECONDARY); // Lightest Mint Header
+        header.setBackground(ThemeColors.ACCENT_SECONDARY);
         header.setBorder(BorderFactory.createEmptyBorder(15, 30, 15, 30));
 
         // Left Side: Logo/Title
@@ -71,15 +74,14 @@ public class MainWindow extends JFrame {
         welcome.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         welcome.setForeground(ThemeColors.TEXT_PRIMARY);
 
-        // Use ThemeButton for high contrast logout button
         JButton logoutBtn = ThemeButton.createPrimary("Logout", ThemeColors.LOGOUT_RED);
         logoutBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        logoutBtn.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15)); // Smaller padding for header
+        logoutBtn.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
 
         logoutBtn.addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Logged out successfully!", "Logout", JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
-            new LoginPage();
+            new LoginPage().setVisible(true);
         });
 
         userPanel.add(welcome);
@@ -94,10 +96,7 @@ public class MainWindow extends JFrame {
         cardLayout.show(mainPanel, name);
     }
 
-    public long getCurrentUserId() {
-        return currentUser.getId();
-    }
-
+    // CRITICAL: Getter for the current user object (used for reporting)
     public User getCurrentUser() {
         return currentUser;
     }

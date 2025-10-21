@@ -12,7 +12,7 @@ public class Place {
     private boolean hasBrailleSignage;
     private boolean hasElevator;
 
-    // 1. Full 9-argument constructor (used when fetching from DB)
+    // Full 9-argument constructor (used when fetching from DB)
     public Place(long id, String name, String description, String location, String category,
                  boolean hasRamp, boolean hasAccessibleToilet, boolean hasBrailleSignage, boolean hasElevator) {
         this.id = id;
@@ -26,8 +26,7 @@ public class Place {
         this.hasElevator = hasElevator;
     }
 
-    // 2. CRITICAL FIX: 8-argument constructor for NEW places (ID is 0 for DB auto-generation)
-    // This resolves the "Cannot resolve constructor" error.
+    // 8-argument constructor for NEW places
     public Place(String name, String description, String location, String category,
                  boolean hasRamp, boolean hasAccessibleToilet, boolean hasBrailleSignage, boolean hasElevator) {
         this(0, name, description, location, category, hasRamp, hasAccessibleToilet, hasBrailleSignage, hasElevator);
@@ -44,6 +43,11 @@ public class Place {
     public String getDescription() { return description; }
     public String getLocation() { return location; }
     public String getCategory() { return category; }
+
+    // NEW SETTER (Resolves 'Cannot resolve method setId' error)
+    public void setId(long id) {
+        this.id = id;
+    }
 
     // Feature Getters
     public boolean isHasRamp() { return hasRamp; }

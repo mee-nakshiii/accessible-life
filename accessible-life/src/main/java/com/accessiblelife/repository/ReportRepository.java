@@ -6,12 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-// NOTE: You must create a 'reports' table in your database for this to work:
-// CREATE TABLE reports (report_id BIGINT AUTO_INCREMENT PRIMARY KEY, place_id BIGINT, user_id BIGINT, reason TEXT, status VARCHAR(50) DEFAULT 'Pending');
-
 public class ReportRepository {
 
-    // NEW FUNCTIONALITY: Submit a report about a place
     public boolean submitReport(long placeId, long userId, String reason) {
         Connection conn = DatabaseManager.getConnection();
         if (conn == null) return false;
@@ -28,6 +24,12 @@ public class ReportRepository {
             System.err.println("❌ SQL error while submitting report:");
             e.printStackTrace();
             return false;
+        } finally {
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.err.println("Error closing connection after report submission: " + e.getMessage());
+            }
         }
     }
 }

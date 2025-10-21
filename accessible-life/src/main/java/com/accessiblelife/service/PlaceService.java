@@ -12,7 +12,6 @@ public class PlaceService {
         return placeRepository.getAllPlaces();
     }
 
-    // FIX: Add the missing method signature that SearchByFeature.java requires
     public List<Place> searchPlacesByFeatures(boolean ramp, boolean toilet, boolean braille, boolean elevator) {
         return placeRepository.searchPlacesByFeatures(ramp, toilet, braille, elevator);
     }
@@ -34,7 +33,14 @@ public class PlaceService {
     }
 
     public boolean updatePlace(Place place) {
-        // This relies on the placeholder method in the repository.
+        if (place.getId() <= 0) {
+            System.err.println("Place ID required for update.");
+            return false;
+        }
+        if (place.getName().trim().isEmpty() || place.getLocation().trim().isEmpty()) {
+            System.err.println("Place name and location cannot be empty for update.");
+            return false;
+        }
         return placeRepository.updatePlace(place);
     }
 
